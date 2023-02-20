@@ -4,6 +4,7 @@ associate <- function(data,
                       exposure = NULL,
                       covariates = NULL,
                       args = list(),
+                      p.trend = TRUE,
                       n.quantile = NULL,
                       right = TRUE,
                       labels = NULL,
@@ -12,14 +13,18 @@ associate <- function(data,
   outcome    <- srmisc::select_variable(data, outcome)
   time       <- srmisc::select_variable(data, time)
   exposure   <- srmisc::select_variable(data, exposure)
-  covariates <- as.list(covariates)
 
   if(srmisc::is_empty(covariates)){
     covariates <- list(NULL)
   }else{
-    covariates <- lapply(covariates, \(covar){
-      srmisc::select_variable(data, covar)
-    })
+    if(is.list(covariates)){
+      covariates <- lapply(covariates, \(covar){
+        srmisc::select_variable(data, covar)
+      })
+    }else{
+      covariates <- srmisc::select_variable(data, covariates)
+      covariates <- list(covariates)
+    }
   }
 
   model <- function(data, x, covar){
@@ -49,12 +54,18 @@ associate <- function(data,
                                    labels = labels)
 
       res1 <- model(data, x = paste0("gq_", exposure), covar)
-      res2 <- model(data, x = paste0("mq_", exposure), covar)
-      res2 <- res2[, c(1, ncol(res2)), drop = FALSE]
-      res1[1, 1] <- exposure
-      res2[1, 1] <- exposure
-      names(res2)[2] <- "P for trend"
-      srmisc::merge_left(res1, res2, by = names(res1)[1])
+
+      if(p.trend){
+        res2 <- model(data, x = paste0("mq_", exposure), covar)
+        res2 <- res2[, c(1, ncol(res2)), drop = FALSE]
+        res1[1, 1] <- exposure
+        res2[1, 1] <- exposure
+        names(res2)[2] <- "P for trend"
+        srmisc::merge_left(res1, res2, by = names(res1)[1])
+      }else{
+        res1[1, 1] <- exposure
+        res1
+      }
     }else{
       model(data, x = exposure, covar)
     }
@@ -63,9 +74,14 @@ associate <- function(data,
   results <- lapply(covariates, exec)
   output <- results[[1]]
 
-  if(length(results) > 1L){
-    for(i in 2:length(results)){
+  MNAMES <-sprintf("model %d", 1:length(output))
 
+  if(length(results) > 1L){
+
+    names(output) <- c(names(output)[1:2], paste(MNAMES[1], names(output)[-c(1, 2)], sep = "__"))
+
+    for(i in 2:length(results)){
+      output <- srmisc::merge_table(output, results[[i]][, -2, drop = FALSE], name.y = MNAMES[i])
     }
   }
 
