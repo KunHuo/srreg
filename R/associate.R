@@ -27,6 +27,10 @@ associate <- function(data,
     }
   }
 
+  # If time is specified, a Cox regression model is fitted;
+  # otherwise a model is fitted according to the dependent variable:
+  # a logistic regression model for dichotomous variables and
+  # a multiple linear regression model for continuous variables.
   model <- function(data, x, covar){
     indepts <- c(x, covar)
     if (is.null(time)) {
@@ -45,6 +49,9 @@ associate <- function(data,
     srmisc::typeset(fit, data = data, outcome = outcome, varnames = x, filter = x,  ...)
   }
 
+  # Cyclic execution of regression models
+  # If the exposed variable is continuous, the exposed variable is grouped
+  # according to the quantile specified by n.quantile.
   exec <- function(covar){
     if(!is.null(n.quantile) & is.numeric(data[[exposure]]) ){
       data <- srmisc::cut_quantile(data,
@@ -53,9 +60,11 @@ associate <- function(data,
                                    right = right,
                                    labels = labels)
 
+      # Model for quantiles.
       res1 <- model(data, x = paste0("gq_", exposure), covar)
 
       if(p.trend){
+        # Model for trend.
         res2 <- model(data, x = paste0("mq_", exposure), covar)
         res2 <- res2[, c(1, ncol(res2)), drop = FALSE]
         res1[1, 1] <- exposure
@@ -75,13 +84,25 @@ associate <- function(data,
   output <- results[[1]]
 
   if(length(results) > 1L){
-    MNAMES <-sprintf("model %d", 1:length(output))
+    MNAMES <-sprintf("Model %d %s", 1:length(output), letters[1:length(output)])
     names(output) <- c(names(output)[1:2], paste(MNAMES[1], names(output)[-c(1, 2)], sep = "__"))
 
     for(i in 2:length(results)){
       output <- srmisc::merge_table(output, results[[i]][, -2, drop = FALSE], name.y = MNAMES[i])
     }
+
+    notes <- sapply(covariates, function(x){
+      if(is.null(x)){
+        "Adjusted for nothing."
+      }else{
+        paste("Adjusted for", paste(x, sep = ", "), sep = " ")
+      }
+    })
+  }else{
+    notes <- "ddd"
   }
 
+
+  attr(output, "note") <- notes
   output
 }
