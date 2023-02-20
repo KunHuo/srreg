@@ -74,10 +74,8 @@ associate <- function(data,
   results <- lapply(covariates, exec)
   output <- results[[1]]
 
-  MNAMES <-sprintf("model %d", 1:length(output))
-
   if(length(results) > 1L){
-
+    MNAMES <-sprintf("model %d", 1:length(output))
     names(output) <- c(names(output)[1:2], paste(MNAMES[1], names(output)[-c(1, 2)], sep = "__"))
 
     for(i in 2:length(results)){
