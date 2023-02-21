@@ -1,3 +1,71 @@
+#' Association between the two variables
+#'
+#' @description Calculate the association between the two variables by
+#' regression models (e.g. linear regression, logistic regression, Cox regression).
+#'
+#' @param data a data frame.
+#' @param outcome outcome variable name.
+#' @param time time variable name, for Cox regression.
+#' @param exposure exposure variable name.
+#' @param covariates covariate names, a vector or a list.
+#' @param args arguments passed to method from [lm()], [glm()] or [survival::coxph()].
+#' @param p.trend Tests for linear trend when exposure is numeric variable,
+#' and set n.quantile.
+#' @param n.quantile indicates how many quantiles to convert when exposure is
+#' numeric variable.
+#' @param quantile.right logical, indicating if the intervals should be closed
+#' on the right (and open on the left) or vice versa.
+#' @param quantile.labels labels for the levels of the resulting category.
+#' By default, labels are constructed using "(a,b]" interval notation. If labels
+#' = FALSE, simple integer codes are returned instead of a factor.
+#' @param ... arguments passed to [srmisc::typeset()].
+#'
+#' @return a data.frame.
+#' @export
+#'
+#' @examples
+#' library(srmisc)
+#'
+#' cancer$sex  <- factor(cancer$sex)
+#' cancer$race <- factor(cancer$race)
+#' cancer$meta <- factor(cancer$meta)
+#'
+#' # Association Between Metastasis and Tumor size by Linear Regression Model
+#' # Model 1 adjusted for age, sex.
+#' # Model 2 adjusted for age, sex, and race.
+#' associate(data = cancer,
+#'           outcome = "size",
+#'           exposure = "meta",
+#'           covariates = list(c("sex", "age"), c("sex", "age", "race")))
+#'
+#' # Association Between Race and Metastasis by Logistic Regression Model
+#' # Model 1 adjusted for nothing.
+#' # Model 2 adjusted for age, sex, and size.
+#' associate(data = cancer,
+#'           outcome = "meta",
+#'           exposure = "race",
+#'           covariates = list("Adjusted 1" = NULL,
+#'                             "Adjusted 2" = c("sex", "age", "size")))
+#'
+#' # Association Between Race and Survival status by Cox Proportional Hazards Regression Model
+#' # Model 1 adjusted for nothing.
+#' # Model 2 adjusted for age, sex, and size.
+#' associate(data = cancer,
+#'           outcome = "status",
+#'           time = "time",
+#'           exposure = "race",
+#'           covariates = list("Adjusted 1" = NULL,
+#'                             "Adjusted 2" = c("sex", "age", "size")))
+#'
+#' # Tests for linear trend were done by modeling the median value of each quantile
+#' # to test ordered relations across quantiles of size.
+#' associate(data = cancer,
+#'           outcome = "status",
+#'           time = "time",
+#'           exposure = "size",
+#'           covariates = list("Adjusted 1" = NULL,
+#'                             "Adjusted 2" = c("sex", "age", "race")),
+#'           n.quantile = 4)
 associate <- function(data,
                       outcome = NULL,
                       time = NULL,
@@ -109,12 +177,21 @@ associate <- function(data,
   # Output title
   if(is.null(time)){
     if(length(unique(data[[outcome]])) == 2L){
-      title <- "logistic"
+      title <- sprintf("Table: Association Between %s and %s by Logistic Regression Model",
+                       srmisc::get_var_label(data, exposure, default = ".name"),
+                       srmisc::get_var_label(data, outcome,  default = ".name"))
+      abbr <- "Abbreviation: OR, odds ratio; CI, confidence interval."
     }else{
-      title <- "linear"
+      title <- sprintf("Table: Association Between %s and %s by Linear Regression Model",
+                       srmisc::get_var_label(data, exposure, default = ".name"),
+                       srmisc::get_var_label(data, outcome,  default = ".name"))
+      abbr <- "Abbreviation: CI, confidence interval."
     }
   }else{
-    title <- "Cox"
+    title <- sprintf("Table: Association Between %s and %s by Cox Proportional Hazards Regression Model",
+                     srmisc::get_var_label(data, exposure, default = ".name"),
+                     srmisc::get_var_label(data, outcome,  default = ".name"))
+    abbr <- "Abbreviation: HR, hazard ratio; CI, confidence interval."
   }
 
   # Output notes
@@ -143,11 +220,13 @@ associate <- function(data,
     }
     note.trend <- sprintf(note.trend, srmisc::get_var_label(data, exposure, default = ".name"))
     if(length(results) == 1L){
-      notes <- c(notes, sprintf("\n%s %s.", "a", note.trend))
+      notes <- paste(notes, sprintf("%s %s.", "a", note.trend), sep = "\n")
     }else{
-      notes <- c(notes, sprintf("\n%s %s.", letters[length(results) + 1], note.trend))
+      notes <- paste(notes, sprintf("%s %s.", letters[length(results) + 1], note.trend), sep = "\n")
     }
   }
+
+  notes <- paste(abbr, notes, sep = "\n")
 
   attr(output, "title") <- title
   attr(output, "note")  <- notes
