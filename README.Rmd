@@ -1,0 +1,43 @@
+---
+title: srreg
+author: Author by Rongrui Huo
+output: github_document
+---
+
+```{r, message = FALSE, tidy = FALSE, echo = F}
+showMessage <- FALSE
+showWarning <- TRUE
+knitr::set_alias(w = "fig.width", h = "fig.height", res = "results")
+knitr::opts_chunk$set(comment = "##", error= TRUE, warning = showWarning, message = showMessage,
+               tidy = FALSE, cache = FALSE, echo = TRUE,
+               fig.width = 5, fig.height = 4.5,
+               fig.path = "README-files/README_")
+
+## R configuration
+options(width = 116, scipen = 5)
+```
+
+# Description
+
+Statistical Report for Regressions (e.g. linear regression, logistic regression, Cox regression).
+
+# Installation
+
+The the development version can be installed using the **devtools** R-Package:
+```{r, eval=FALSE}
+# Install devtools (if you do not have it already)
+install.packages("devtools")
+devtools::install_github("kunhuo/srmisc")
+devtools::install_github("kunhuo/srreg")
+```
+
+or the **remotes** R-Package:
+```{r, eval=FALSE}
+install.packages("remotes")
+remotes::install_github("kunhuo/srmisc")
+remotes::install_github("kunhuo/srreg")
+```
+
+# Bug Reports and Feature Requests
+
+If you encounter any bugs or have any specific feature requests, please file an [Issue](https://github.com/KunHuo/srreg/issues).
