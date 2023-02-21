@@ -2,7 +2,7 @@
 % Please edit documentation in R/associate.R
 \name{associate}
 \alias{associate}
-\title{Association between the two variables}
+\title{Association analysis by regression}
 \usage{
 associate(
   data,
