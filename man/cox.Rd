@@ -2,7 +2,7 @@
 % Please edit documentation in R/cox.R
 \name{cox}
 \alias{cox}
-\title{Fit proportional hazards models}
+\title{Fitting proportional hazards models}
 \usage{
 cox(data, formula, ...)
 }
