@@ -1,4 +1,4 @@
-#' Association between the two variables
+#' Association analysis by regression
 #'
 #' @description Calculate the association between the two variables by
 #' regression models (e.g. linear regression, logistic regression, Cox regression).
