@@ -85,5 +85,8 @@ subgroup <- function(data,
   output <- output[, -c(1:3), drop = FALSE]
   names(output)[1] <- "Subgroup"
   output
+
+
+  srmisc::describe_event(data = data, event = outcome, varnames = strata, method = "n.event.total")
 }
 
