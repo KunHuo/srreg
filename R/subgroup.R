@@ -4,7 +4,12 @@ subgroup <- function(data,
                     exposure = NULL,
                     covariates = NULL,
                     strata = NULL,
-                    args = list(), ...){
+                    args = list(),
+                    p.trend = TRUE,
+                    n.quantile = NULL,
+                    quantile.right = TRUE,
+                    quantile.labels = NULL,
+                    ...){
 
   outcome    <- srmisc::select_variable(data, outcome)
   time       <- srmisc::select_variable(data, time)
@@ -52,7 +57,8 @@ subgroup <- function(data,
                        time = time,
                        exposure = exposure,
                        covariates = setdiff(covariates, svar),
-                       select = c("effect"), ...)
+                       select = c("effect"),
+                       ...)
       res[-1, , drop = FALSE]
     }, warning = FALSE)
 
@@ -66,13 +72,72 @@ subgroup <- function(data,
                                    include.id = FALSE)
     }
     gres
+
+
+  }
+
+  exec_numeric <- function(svar){
+    gres <- srmisc::group_exec(data, group = svar, func = function(d){
+      d <-  droplevels.data.frame(d)
+      res <- associate(data = d,
+                       outcome = outcome,
+                       time = time,
+                       exposure = paste0("gq_", exposure),
+                       covariates = setdiff(covariates, svar),
+                       select = c("effect"),
+                       ...)
+      res[-1, , drop = FALSE]
+    }, warning = FALSE)
+
+    if(!is.null(gres)){
+      gres$id <- rep(1:length(unique(data[[svar]])),
+                     each = length(unique(data[[paste0("gq_", exposure)]])))
+      gres <- srmisc::reshape_wide(gres,
+                                   id = "id",
+                                   names.from = 2,
+                                   values.from = 3,
+                                   include.id = FALSE)
+      if(p.trend){
+        trend <- srmisc::group_exec(data, group = svar, func = function(d){
+          d <-  droplevels.data.frame(d)
+          associate(data = d,
+                    outcome = outcome,
+                    time = time,
+                    exposure = paste0("mq_", exposure),
+                    covariates = setdiff(covariates, svar),
+                    select = c("p.value"),
+                    ...)
+        }, warning = FALSE)
+
+        if(!is.null(trend)){
+          trend <- trend[, -2, drop = FALSE]
+          names(trend)[2] <- "P for trend"
+          gres <- srmisc::merge_left(gres, trend, by = names(gres)[1])
+        }
+      }
+    }
+    gres
   }
 
   # Loop execution function
-  if(length(unique(data[[exposure]])) < 3L){
-    results <- lapply(strata, exec2)
+  if(is.factor(data[[exposure]]) | is.character(data[[exposure]])){
+    if(length(unique(data[[exposure]])) < 3L){
+      results <- lapply(strata, exec2)
+    }else{
+      results <- lapply(strata, exec3)
+    }
   }else{
-    results <- lapply(strata, exec3)
+
+    if(!is.null(n.quantile)){
+      data <- srmisc::cut_quantile(data,
+                                   varname = exposure,
+                                   n = n.quantile,
+                                   right = quantile.right,
+                                   labels = quantile.labels)
+      results <- lapply(strata, exec_numeric)
+    }else{
+      results <- lapply(strata, exec2)
+    }
   }
 
   # Formatting results
@@ -97,10 +162,17 @@ subgroup <- function(data,
   names(desc)[2] <- ifelse(desc.method == "n.total", "No. of total", "No. of event/total")
   output <- srmisc::merge_left(output, desc, by = "term")
 
+
+  if(!is.null(n.quantile) & is.numeric(data[[exposure]])){
+    LRT.exposure <- paste0("gq_", exposure)
+  }else{
+    LRT.exposure <- exposure
+  }
+
   LRT.results <- LRT(data = data,
                      outcome = outcome,
                      time = time,
-                     exposure = exposure,
+                     exposure = LRT.exposure,
                      covariates = covariates,
                      strata = strata,
                      args = args)
