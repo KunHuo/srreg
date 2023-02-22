@@ -21,21 +21,7 @@ subgroup <- function(data,
   strata <- setdiff(strata, outcome)
   strata <- setdiff(strata, exposure)
 
-  # P.LRT <- lapply(strata, function(sg){
-  #   adjusted <- setdiff(adjusted, sg)
-  #   frm1 <- create_formula(self$dependent,  c(exposure, sg, adjusted))
-  #   frm2 <- create_formula2(self$dependent, exposure, sg, adjusted)
-  #
-  #   model1 <- private$model(formula = frm1, data = self$data)
-  #   model2 <- private$model(formula = frm2, data = self$data)
-  #
-  #   pvalue <- stats::anova(model1, model2, test = "LRT")
-  #   pvalue <- format_pvalue(pvalue[, ncol(pvalue)][2], digits = private$.digits.pvalue)
-  #   res <- data.frame(term = sg, pvalue)
-  #   names(res)[2] <- "P for interaction"
-  #   res
-  # })
-
+  # Functions executed with a unique value of the exposure variable less than or equal to 2.
   exec2 <- function(svar){
     gres <-  srmisc::group_exec(data, group = svar, func = function(d){
       d <-  droplevels.data.frame(d)
@@ -50,10 +36,14 @@ subgroup <- function(data,
       }
       res
     }, warning = FALSE)
-    gres <- gres[, -2, drop = FALSE]
+
+    if(!is.null(gres)){
+      gres <- gres[, -2, drop = FALSE]
+    }
     gres
   }
 
+  # Functions executed with a unique value of the exposure variable great than 2.
   exec3 <- function(svar){
     gres <- srmisc::group_exec(data, group = svar, func = function(d){
       d <-  droplevels.data.frame(d)
@@ -63,30 +53,98 @@ subgroup <- function(data,
                        exposure = exposure,
                        covariates = setdiff(covariates, svar),
                        select = c("effect"), ...)
-      res <- res[-1, , drop = FALSE]
-      res
-    })
+      res[-1, , drop = FALSE]
+    }, warning = FALSE)
 
-    gres$id <- rep(1:length(unique(data[[svar]])), each = length(unique(data[[exposure]])))
-
-    gres <- srmisc::reshape_wide(gres, id = "id", names.from = 2, values.from = 3, include.id = FALSE)
+    if(!is.null(gres)){
+      gres$id <- rep(1:length(unique(data[[svar]])),
+                     each = length(unique(data[[exposure]])))
+      gres <- srmisc::reshape_wide(gres,
+                                   id = "id",
+                                   names.from = 2,
+                                   values.from = 3,
+                                   include.id = FALSE)
+    }
     gres
   }
 
-  output <- lapply(strata, exec3)
+  # Loop execution function
+  if(length(unique(data[[exposure]])) < 3L){
+    results <- lapply(strata, exec2)
+  }else{
+    results <- lapply(strata, exec3)
+  }
 
-  output <- lapply(output, function(x){
+  # Formatting results
+  results <- results[!sapply(results, is.null)]
+  results <- lapply(results, function(x){
     x[[1]] <- paste(names(x)[1], x[[1]], sep = "")
     names(x)[1] <- "term"
     x
   })
-  output <- do.call(rbind, output)
-  output <- srmisc::merge_left(srmisc::fmt_reg(data = data, varnames = strata), output, by = "term")
+  results <- do.call(rbind, results)
+
+  # Output variable
+  output <- srmisc::fmt_reg(data = data, varnames = strata)
+
+  # Describe event
+  desc.method <- ifelse(length(unique(data[[outcome]])) == 2L, "n.event.total", "n.total")
+  desc   <- srmisc::describe_event(data = data,
+                                   event = outcome,
+                                   varnames = strata,
+                                   method = desc.method)
+  desc <- desc[, c("term", desc.method)]
+  names(desc)[2] <- ifelse(desc.method == "n.total", "No. of total", "No. of event/total")
+  output <- srmisc::merge_left(output, desc, by = "term")
+
+  LRT.results <- LRT(data = data,
+                     outcome = outcome,
+                     time = time,
+                     exposure = exposure,
+                     covariates = covariates,
+                     strata = strata,
+                     args = args)
+
+  output <- srmisc::merge_left(output, results, by = "term")
+  output <- srmisc::merge_left(output, LRT.results, by = "term")
   output <- output[, -c(1:3), drop = FALSE]
   names(output)[1] <- "Subgroup"
   output
+}
 
 
-  srmisc::describe_event(data = data, event = outcome, varnames = strata, method = "n.event.total")
+LRT <- function(data, outcome, time, exposure, covariates, strata, args = list(), digits.pvalue = 3){
+
+  output <- lapply(strata, \(svar){
+    covariates <- setdiff(covariates, svar)
+    if(srmisc::is_empty(covariates)){
+      covariates <- NULL
+    }
+
+    frm1 <- create_formula(c(time, outcome), c(exposure, svar, covariates))
+    frm2 <- create_formula2(c(time, outcome), exposure, svar, covariates)
+
+    if(is.null(time)){
+      if(length(unique(data[[outcome]])) == 2L){
+        fit1 <- srmisc::do_call(logit, data = data, formula = frm1, args)
+        fit2 <- srmisc::do_call(logit, data = data, formula = frm2, args)
+      }else{
+        if(is.numeric(data[[outcome]])){
+          fit1 <- srmisc::do_call(linear, data = data, formula = frm1, args)
+          fit2 <- srmisc::do_call(linear, data = data, formula = frm2, args)
+        }
+      }
+    }else{
+      fit1 <- srmisc::do_call(cox, data = data, formula = frm1, args)
+      fit2 <- srmisc::do_call(cox, data = data, formula = frm2, args)
+    }
+
+    pvalue <- stats::anova(fit1, fit2, test = "LRT")
+    pvalue <- srmisc::fmt_pvalue(pvalue[, ncol(pvalue)][2], digits = digits.pvalue)
+    res <- data.frame(term = svar, pvalue)
+    names(res)[2] <- "P for interaction"
+    res
+  })
+  do.call(rbind, output)
 }
 
