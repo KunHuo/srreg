@@ -70,7 +70,7 @@ conf.int = TRUE. Must be strictly greater than 0 and less than 1. Defaults to
 \item{...}{further arguments.}
 }
 \value{
-a data frame
+a data frame.
 }
 \description{
 Calculate the association between the two variables stratified by
