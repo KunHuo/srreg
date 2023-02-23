@@ -1,4 +1,4 @@
-#' Fitting proportional hazards models
+#' Fitting Cox models
 #'
 #' @description
 #' Fits a Cox proportional hazards regression model. Time dependent variables,
