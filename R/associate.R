@@ -1,4 +1,4 @@
-#' Association analysis by regression
+#' Association analysis
 #'
 #' @description Calculate the association between the two variables by
 #' regression models (e.g. linear regression, logistic regression, Cox regression).
@@ -18,7 +18,15 @@
 #' @param quantile.labels labels for the levels of the resulting category.
 #' By default, labels are constructed using "(a,b]" interval notation. If labels
 #' = FALSE, simple integer codes are returned instead of a factor.
-#' @param ... arguments passed to [srmisc::typeset()].
+#' @param conf.level The confidence level to use for the confidence interval if
+#' conf.int = TRUE. Must be strictly greater than 0 and less than 1. Defaults to
+#' 0.95, which corresponds to a 95 percent confidence interval.
+#' @param conf.brackets brackets of CI format.
+#' @param conf.separator separate of CI format.
+#' @param digits.pvalue digits for P value, default 3.
+#' @param digits.effect digits for effect value (e.g., OR, HR, or RR), default 2.
+#' @param ref.value reference value.
+#' @param ... further arguments.
 #'
 #' @return a data.frame.
 #' @export
@@ -76,6 +84,12 @@ associate <- function(data,
                       n.quantile = NULL,
                       quantile.right = TRUE,
                       quantile.labels = NULL,
+                      conf.level = 0.95,
+                      conf.brackets = NULL,
+                      conf.separator = NULL,
+                      digits.pvalue = 3,
+                      digits.effect = 2,
+                      ref.value = 1,
                       ...){
 
   outcome    <- srmisc::select_variable(data, outcome)
@@ -114,7 +128,18 @@ associate <- function(data,
       frm <- create_formula(dependent = c(time, outcome), independents = indepts)
       fit <- srmisc::do_call(cox, data = data, formula = frm, args)
     }
-    srmisc::typeset(fit, data = data, outcome = outcome, varnames = x, filter = x,  ...)
+    srmisc::typeset(fit,
+                    data = data,
+                    outcome = outcome,
+                    varnames = x,
+                    filter = x,
+                    conf.level = conf.level,
+                    conf.brackets = conf.brackets,
+                    conf.separator = conf.separator,
+                    digits.pvalue = digits.pvalue,
+                    digits.effect = digits.effect,
+                    ref.value = ref.value,
+                    ...)
   }
 
 
@@ -177,18 +202,18 @@ associate <- function(data,
   # Output title
   if(is.null(time)){
     if(length(unique(data[[outcome]])) == 2L){
-      title <- sprintf("Table: Association Between %s and %s by Logistic Regression Model",
+      title <- sprintf("Table: Association between %s and %s using logistic regression model",
                        srmisc::get_var_label(data, exposure, default = ".name"),
                        srmisc::get_var_label(data, outcome,  default = ".name"))
       abbr <- "Abbreviation: OR, odds ratio; CI, confidence interval."
     }else{
-      title <- sprintf("Table: Association Between %s and %s by Linear Regression Model",
+      title <- sprintf("Table: Association Between %s and %s using linear regression model",
                        srmisc::get_var_label(data, exposure, default = ".name"),
                        srmisc::get_var_label(data, outcome,  default = ".name"))
       abbr <- "Abbreviation: CI, confidence interval."
     }
   }else{
-    title <- sprintf("Table: Association Between %s and %s by Cox Proportional Hazards Regression Model",
+    title <- sprintf("Table: Association between %s and %s using Cox proportional hazards regression model",
                      srmisc::get_var_label(data, exposure, default = ".name"),
                      srmisc::get_var_label(data, outcome,  default = ".name"))
     abbr <- "Abbreviation: HR, hazard ratio; CI, confidence interval."
@@ -212,11 +237,11 @@ associate <- function(data,
   # Note of p for trend.
   if(!is.null(n.quantile) & p.trend){
     if(n.quantile == 3L){
-      note.trend <- "Tests for linear trend were done by modeling the median value of each tertile to test ordered relations across tertiles of %s"
+      note.trend <- "Tests for linear trend were done by modeling the median value of each tertile to test ordered relations across tertiles of %s."
     }else if(n.quantile == 4L){
-      note.trend <- "Tests for linear trend were done by modeling the median value of each quantile to test ordered relations across quantiles of %s"
+      note.trend <- "Tests for linear trend were done by modeling the median value of each quantile to test ordered relations across quantiles of %s."
     }else{
-      note.trend <- "Tests for linear trend were done by modeling the median value of each group to test ordered relations across quantiles of %s"
+      note.trend <- "Tests for linear trend were done by modeling the median value of each group to test ordered relations across quantiles of %s."
     }
     note.trend <- sprintf(note.trend, srmisc::get_var_label(data, exposure, default = ".name"))
     if(length(results) == 1L){
@@ -230,5 +255,6 @@ associate <- function(data,
 
   attr(output, "title") <- title
   attr(output, "note")  <- notes
+  class(output) <- c("srreg", "data.frame")
   output
 }
