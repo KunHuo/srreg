@@ -109,25 +109,15 @@ associate <- function(data,
     }
   }
 
+  method <- guess_model(data, outcome = outcome, time = time)
+
   # If time is specified, a Cox regression model is fitted;
   # otherwise a model is fitted according to the dependent variable:
   # a logistic regression model for dichotomous variables and
   # a multiple linear regression model for continuous variables.
   model <- function(data, x, covar){
-    indepts <- c(x, covar)
-    if (is.null(time)) {
-      frm <- create_formula(dependent = outcome, independents = indepts)
-      if(length(unique(data[[outcome]])) == 2L){
-        fit <- srmisc::do_call(logit, data = data, formula = frm, args)
-      }else{
-        if(is.numeric(data[[outcome]])){
-          fit <- srmisc::do_call(linear, data = data, formula = frm, args)
-        }
-      }
-    }else{
-      frm <- create_formula(dependent = c(time, outcome), independents = indepts)
-      fit <- srmisc::do_call(cox, data = data, formula = frm, args)
-    }
+    frm <- create_formula(dependent = c(time, outcome), independents = c(x, covar))
+    fit <- srmisc::do_call(method, data = data, formula = frm, args)
     srmisc::typeset(fit,
                     data = data,
                     outcome = outcome,
@@ -141,7 +131,6 @@ associate <- function(data,
                     ref.value = ref.value,
                     ...)
   }
-
 
   # If the exposed variable is continuous, the exposed variable is grouped
   # according to the quantile specified by n.quantile.
@@ -199,25 +188,25 @@ associate <- function(data,
     }
   }
 
+  label.exposure <- srmisc::get_var_label(data, exposure, default = ".name")
+  label.outcome  <- srmisc::get_var_label(data, outcome,  default = ".name")
+
   # Output title
-  if(is.null(time)){
-    if(length(unique(data[[outcome]])) == 2L){
-      title <- sprintf("Table: Association between %s and %s using logistic regression model",
-                       srmisc::get_var_label(data, exposure, default = ".name"),
-                       srmisc::get_var_label(data, outcome,  default = ".name"))
-      abbr <- "Abbreviation: OR, odds ratio; CI, confidence interval."
-    }else{
-      title <- sprintf("Table: Association Between %s and %s using linear regression model",
-                       srmisc::get_var_label(data, exposure, default = ".name"),
-                       srmisc::get_var_label(data, outcome,  default = ".name"))
-      abbr <- "Abbreviation: CI, confidence interval."
-    }
-  }else{
-    title <- sprintf("Table: Association between %s and %s using Cox proportional hazards regression model",
-                     srmisc::get_var_label(data, exposure, default = ".name"),
-                     srmisc::get_var_label(data, outcome,  default = ".name"))
-    abbr <- "Abbreviation: HR, hazard ratio; CI, confidence interval."
-  }
+  title <- switch(method,
+                  linear  = "multiple linear regression model",
+                  logit   = "binary logistc regression model",
+                  cox     = "Cox proportional hazards regression model",
+                  default = "")
+  title <- sprintf("Table: Association between %s and %s using %s",
+                   label.exposure,
+                   label.outcome,
+                   title)
+
+  abbr <- switch(method,
+                linear  = "Abbreviation: CI, confidence interval.",
+                logit   = "Abbreviation: OR, adds ratio; CI, confidence interval.",
+                cox     = "Abbreviation: HR, hazard ratio; CI, confidence interval.",
+                default = "")
 
   # Output notes
   notes <- sapply(covariates, function(x){
