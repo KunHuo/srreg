@@ -2,7 +2,7 @@
 % Please edit documentation in R/associate.R
 \name{associate}
 \alias{associate}
-\title{Association analysis by regression}
+\title{Association analysis}
 \usage{
 associate(
   data,
@@ -15,6 +15,12 @@ associate(
   n.quantile = NULL,
   quantile.right = TRUE,
   quantile.labels = NULL,
+  conf.level = 0.95,
+  conf.brackets = NULL,
+  conf.separator = NULL,
+  digits.pvalue = 3,
+  digits.effect = 2,
+  ref.value = 1,
   ...
 )
 }
@@ -44,7 +50,21 @@ on the right (and open on the left) or vice versa.}
 By default, labels are constructed using "(a,b]" interval notation. If labels
 = FALSE, simple integer codes are returned instead of a factor.}
 
-\item{...}{arguments passed to \code{\link[srmisc:typeset]{srmisc::typeset()}}.}
+\item{conf.level}{The confidence level to use for the confidence interval if
+conf.int = TRUE. Must be strictly greater than 0 and less than 1. Defaults to
+0.95, which corresponds to a 95 percent confidence interval.}
+
+\item{conf.brackets}{brackets of CI format.}
+
+\item{conf.separator}{separate of CI format.}
+
+\item{digits.pvalue}{digits for P value, default 3.}
+
+\item{digits.effect}{digits for effect value (e.g., OR, HR, or RR), default 2.}
+
+\item{ref.value}{reference value.}
+
+\item{...}{further arguments.}
 }
 \value{
 a data.frame.
