@@ -1,10 +1,11 @@
-mediation <- function(data,
-                      outcome = NULL,
-                      time = NULL,
-                      exposure = NULL,
-                      mediator = NULL,
-                      covariates = NULL,
-                      args = list(),
+mediate <- function(data,
+                    outcome = NULL,
+                    time = NULL,
+                    exposure = NULL,
+                    mediator = NULL,
+                    covariates = NULL,
+                    args = list(),
+                    sims = 1000,
                       ...){
 
   outcome  <- srmisc::select_variable(data, outcome)
@@ -64,7 +65,7 @@ mediation <- function(data,
                        model.y = fit.out,
                        treat = exposure,
                        mediator = mediator,
-                       robustSE = TRUE, sims = 100, ...)
+                       robustSE = TRUE, sims = sims, ...)
     summary(model)
 
   }
