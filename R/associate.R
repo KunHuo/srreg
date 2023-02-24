@@ -8,6 +8,7 @@
 #' @param time time variable name, for Cox regression.
 #' @param exposure exposure variable name.
 #' @param covariates covariate names, a vector or a list.
+#' @param model model regression.
 #' @param args arguments passed to method from [lm()], [glm()] or [survival::coxph()].
 #' @param p.trend Tests for linear trend when exposure is numeric variable,
 #' and set n.quantile.
@@ -79,6 +80,7 @@ associate <- function(data,
                       time = NULL,
                       exposure = NULL,
                       covariates = NULL,
+                      model = c("auto", "linear", "logit", "cox", "poisson", "logbinom", "multinom"),
                       args = list(),
                       p.trend = TRUE,
                       n.quantile = NULL,
@@ -109,15 +111,15 @@ associate <- function(data,
     }
   }
 
-  method <- guess_model(data, outcome = outcome, time = time)
+  model <- auto_model(data, outcome = outcome, time = time, model = model)
 
   # If time is specified, a Cox regression model is fitted;
   # otherwise a model is fitted according to the dependent variable:
   # a logistic regression model for dichotomous variables and
   # a multiple linear regression model for continuous variables.
-  model <- function(data, x, covar){
+  model_coef <- function(data, x, covar){
     frm <- create_formula(dependent = c(time, outcome), independents = c(x, covar))
-    fit <- srmisc::do_call(method, data = data, formula = frm, args)
+    fit <- srmisc::do_call(model, data = data, formula = frm, args)
     srmisc::typeset(fit,
                     data = data,
                     outcome = outcome,
@@ -142,10 +144,10 @@ associate <- function(data,
                                    right = quantile.right,
                                    labels = quantile.labels)
       # Model for quantiles.
-      res1 <- model(data, x = paste0("gq_", exposure), covar)
+      res1 <- model_coef(data, x = paste0("gq_", exposure), covar)
       if(p.trend){
         # Model for trend.
-        res2 <- model(data, x = paste0("mq_", exposure), covar)
+        res2 <- model_coef(data, x = paste0("mq_", exposure), covar)
         res2 <- res2[, c(1, ncol(res2)), drop = FALSE]
         res1[1, 1] <- srmisc::get_var_label(data, exposure, default = ".name")
         res2[1, 1] <- srmisc::get_var_label(data, exposure, default = ".name")
@@ -162,7 +164,7 @@ associate <- function(data,
         res1
       }
     }else{
-      model(data, x = exposure, covar)
+      model_coef(data, x = exposure, covar)
     }
   }
 
@@ -192,7 +194,7 @@ associate <- function(data,
   label.outcome  <- srmisc::get_var_label(data, outcome,  default = ".name")
 
   # Output title
-  title <- switch(method,
+  title <- switch(model,
                   linear  = "multiple linear regression model",
                   logit   = "binary logistc regression model",
                   cox     = "Cox proportional hazards regression model",
@@ -202,7 +204,7 @@ associate <- function(data,
                    label.outcome,
                    title)
 
-  abbr <- switch(method,
+  abbr <- switch(model,
                 linear  = "Abbreviation: CI, confidence interval.",
                 logit   = "Abbreviation: OR, adds ratio; CI, confidence interval.",
                 cox     = "Abbreviation: HR, hazard ratio; CI, confidence interval.",

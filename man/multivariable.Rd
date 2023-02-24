@@ -9,6 +9,7 @@ multivariable(
   outcome = NULL,
   time = NULL,
   indepts = NULL,
+  model = c("auto", "linear", "logit", "cox", "poisson", "logbinom", "multinom"),
   effect.values = c("net", "b", "se", "effect", "p"),
   conf.level = 0.95,
   conf.brackets = NULL,
@@ -27,6 +28,8 @@ multivariable(
 \item{time}{time variable name, for Cox regression.}
 
 \item{indepts}{independent variable names.}
+
+\item{model}{regression models.}
 
 \item{effect.values}{Effect value, 'ne' for No. of event, 'nt' for No. of
 total, 'net' for No. of event and total, 'nne' for No. of non-event, 'wald'

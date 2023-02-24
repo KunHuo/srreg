@@ -4,6 +4,7 @@
 #' @param outcome outcome variable name.
 #' @param time time variable name, for Cox regression.
 #' @param indepts independent variable names.
+#' @param model regression models.
 #' @param effect.values Effect value, 'ne' for No. of event, 'nt' for No. of
 #' total, 'net' for No. of event and total, 'nne' for No. of non-event, 'wald'
 #' for Wald Chi-square value, 'B' for coefficients, 'p' for P value, 'se' for
@@ -20,10 +21,11 @@
 #'
 #' @return a data frame.
 #' @export
-uniariable <- function(data,
+univariable <- function(data,
                        outcome = NULL,
                        time = NULL,
                        indepts = NULL,
+                       model = c("auto", "linear", "logit", "cox", "poisson", "logbinom", "multinom"),
                        effect.values =  c("net", "b", "se", "effect", "p"),
                        conf.level = 0.95,
                        conf.brackets = NULL,
@@ -44,11 +46,12 @@ uniariable <- function(data,
   indepts <- setdiff(indepts, outcome)
   indepts <- setdiff(indepts, time)
 
-  method <- guess_model(data = data, outcome = outcome, time = time)
+  # model <- match.arg(model)
+  model <- auto_model(data = data, outcome = outcome, time = time, model = model)
 
   output <- lapply(indepts, \(x){
     frm <- create_formula(dependent = c(time, outcome), indepts)
-    fit <- srmisc::do_call(method, data = data, formula = frm, ...)
+    fit <- srmisc::do_call(model, data = data, formula = frm, ...)
     srmisc::typeset(fit,
                     data = data,
                     outcome = outcome,
@@ -65,13 +68,13 @@ uniariable <- function(data,
   })
   output <- do.call(rbind, output)
 
-  title <- switch(method,
+  title <- switch(model,
                   linear  = "Table: Univariable multiple linear regression model",
                   logit   = "Table: Univariable binary logistc regression model",
                   cox     = "Table: Univariable Cox proportional hazards regression model",
-                  default = "Table: Univariable analysis")
+                  "Table: Univariable analysis")
 
-  notes <- switch(method,
+  notes <- switch(model,
                   linear  = "Abbreviation: CI, confidence interval.",
                   logit   = "Abbreviation: OR, adds ratio; CI, confidence interval.",
                   cox     = "Abbreviation: HR, hazard ratio; CI, confidence interval.",

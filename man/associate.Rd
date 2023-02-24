@@ -10,6 +10,7 @@ associate(
   time = NULL,
   exposure = NULL,
   covariates = NULL,
+  model = c("auto", "linear", "logit", "cox", "poisson", "logbinom", "multinom"),
   args = list(),
   p.trend = TRUE,
   n.quantile = NULL,
@@ -34,6 +35,8 @@ associate(
 \item{exposure}{exposure variable name.}
 
 \item{covariates}{covariate names, a vector or a list.}
+
+\item{model}{model regression.}
 
 \item{args}{arguments passed to method from \code{\link[=lm]{lm()}}, \code{\link[=glm]{glm()}} or \code{\link[survival:coxph]{survival::coxph()}}.}
 

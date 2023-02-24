@@ -13,5 +13,6 @@ RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
 Imports: 
     mediation,
+    nnet,
     srmisc,
     survival

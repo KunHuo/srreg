@@ -1,38 +1,59 @@
-guess_model <- function(data, outcome = NULL, time = NULL, method = NULL){
+auto_model <- function(data,
+                        outcome = NULL,
+                        time = NULL,
+                        model = c("auto", "linear", "logit", "cox", "poisson", "logbinom", "multinom")){
 
-  if(is.null(method)){
+  model <- match.arg(model)
+
+  if(model == "auto"){
     vec.outcome <- data[[outcome]]
     vec.length  <- length(unique(vec.outcome))
 
     if(is.null(time)){
       if(is.factor(vec.outcome)){
         if(vec.length == 2L){
-          method <- "logit"
+          model <- "logit"
         }else{
-          stop("There is no executable method.", call. = FALSE)
+          model <- ifelse(is.ordered(vec.outcome), "", "multinom")
         }
       }else if(is.numeric(vec.outcome)){
         if(vec.length == 2L){
-          method <- "logit"
+          model <- "logit"
         }else{
-          method <- "linear"
+          model <- "linear"
         }
       }else if(is.character(vec.outcome)){
         if(vec.length == 2L){
-          method <- "logit"
+          model <- "logit"
         }else{
-          stop("There is no executable method.", call. = FALSE)
+          model <- "multinom"
         }
       }
     }else{
-      method <- "cox"
+      model <- "cox"
     }
   }
-  method
+  model
 }
 
 
-LRT <- function(data, outcome, time, exposure, covariates, strata, args = list(), digits.pvalue = 3){
+model_names <- function(model){
+  switch(model,
+         linear   = "multiple linear regression",
+         logit    = "binary logistc regression",
+         cox      = "Cox proportional hazards regression",
+         poisson  = "",
+         logbinom = "",
+         multinom = "")
+}
+
+
+
+
+
+LRT <- function(data, outcome, time, exposure, covariates, strata, model, args = list(), digits.pvalue = 3){
+
+  model <- auto_model(data, outcome = outcome, time = time, model = model)
 
   output <- lapply(strata, \(svar){
     covariates <- setdiff(covariates, svar)
@@ -43,20 +64,8 @@ LRT <- function(data, outcome, time, exposure, covariates, strata, args = list()
     frm1 <- create_formula(c(time, outcome), c(exposure, svar, covariates))
     frm2 <- create_formula2(c(time, outcome), exposure, svar, covariates)
 
-    if(is.null(time)){
-      if(length(unique(data[[outcome]])) == 2L){
-        fit1 <- srmisc::do_call(logit, data = data, formula = frm1, args)
-        fit2 <- srmisc::do_call(logit, data = data, formula = frm2, args)
-      }else{
-        if(is.numeric(data[[outcome]])){
-          fit1 <- srmisc::do_call(linear, data = data, formula = frm1, args)
-          fit2 <- srmisc::do_call(linear, data = data, formula = frm2, args)
-        }
-      }
-    }else{
-      fit1 <- srmisc::do_call(cox, data = data, formula = frm1, args)
-      fit2 <- srmisc::do_call(cox, data = data, formula = frm2, args)
-    }
+    fit1 <- srmisc::do_call(model, data = data, formula = frm1, args)
+    fit2 <- srmisc::do_call(model, data = data, formula = frm2, args)
 
     pvalue <- stats::anova(fit1, fit2, test = "LRT")
     pvalue <- srmisc::fmt_pvalue(pvalue[, ncol(pvalue)][2], digits = digits.pvalue)

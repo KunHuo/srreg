@@ -1,6 +1,6 @@
 #' Multivariable analysis
 #'
-#' @inheritParams uniariable
+#' @inheritParams univariable
 #'
 #' @return a data frame.
 #' @export
@@ -8,6 +8,7 @@ multivariable <- function(data,
                           outcome = NULL,
                           time = NULL,
                           indepts = NULL,
+                          model = c("auto", "linear", "logit", "cox", "poisson", "logbinom", "multinom"),
                           effect.values =  c("net", "b", "se", "effect", "p"),
                           conf.level = 0.95,
                           conf.brackets = NULL,
@@ -28,9 +29,9 @@ multivariable <- function(data,
   indepts <- setdiff(indepts, outcome)
   indepts <- setdiff(indepts, time)
 
-  method <- guess_model(data = data, outcome = outcome, time = time)
+  model <- auto_model(data = data, outcome = outcome, time = time, model = model)
   frm    <- create_formula(dependent = c(time, outcome), indepts)
-  fit    <- srmisc::do_call(method, data = data, formula = frm, ...)
+  fit    <- srmisc::do_call(model, data = data, formula = frm, ...)
 
   output <- srmisc::typeset(fit,
                   data = data,
@@ -44,13 +45,13 @@ multivariable <- function(data,
                   digits.effect = digits.effect,
                   ref.value = ref.value)
 
-  title <- switch(method,
+  title <- switch(model,
                   linear  = "Table: Multivariable multiple linear regression model",
                   logit   = "Table: Multivariable binary logistc regression model",
                   cox     = "Table: Multivariable Cox proportional hazards regression model",
                   default = "Table: Multivariable analysis")
 
-  notes <- switch(method,
+  notes <- switch(model,
                   linear  = "Abbreviation: CI, confidence interval.",
                   logit   = "Abbreviation: OR, adds ratio; CI, confidence interval.",
                   cox     = "Abbreviation: HR, hazard ratio; CI, confidence interval.",
