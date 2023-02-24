@@ -88,12 +88,12 @@ univariable.data.frame <- function(data,
   output <- do.call(rbind, output)
 
   title <- switch(model,
-                  linear  = "Table: Univariable linear regression",
-                  logit   = "Table: Univariable binary logistc regression",
-                  cox     = "Table: Univariable Cox proportional hazards regression",
-                  poson   = "Table: Univariable modified Poissson regression",
-                  logbinom = "Table: Univariable log-binomial regression",
-                  "Table: Univariable analysis")
+                  linear  = "Univariable linear regression",
+                  logit   = "Univariable binary logistc regression",
+                  cox     = "Univariable Cox proportional hazards regression",
+                  poson   = "Univariable modified Poissson regression",
+                  logbinom = "Univariable log-binomial regression",
+                  "Univariable analysis")
 
   notes <- switch(model,
                   linear  = "Abbreviation: CI, confidence interval.",
@@ -129,7 +129,7 @@ univariable.lm <- function(data,
    outcome <- all.vars(data$terms)[1]
    indepts <- all.vars(attr(data$model, "terms"))[-1]
 
-   output <- univariable.data.frame(data = d,
+   univariable.data.frame(data = d,
                           outcome = outcome,
                           indepts = indepts,
                           model = model,
@@ -141,10 +141,6 @@ univariable.lm <- function(data,
                           digits.effect = digits.effect,
                           ref.value = ref.value,
                           ...)
-   # attr(output, "title") <- "Table: Univariable linear regression model"
-   # attr(output, "note")  <- "Abbreviation: CI, confidence interval."
-   # class(output) <- c("srreg", "data.frame")
-   output
 }
 
 
@@ -181,19 +177,60 @@ univariable.glm <- function(data,
     model <- "poson"
   }
 
-  output <- univariable.data.frame(data = d,
-                                   outcome = outcome,
-                                   indepts = indepts,
-                                   model = model,
-                                   effect.values = effect.values,
-                                   conf.level = conf.level,
-                                   conf.brackets = conf.brackets,
-                                   conf.separator = conf.separator,
-                                   digits.pvalue = digits.pvalue,
-                                   digits.effect = digits.effect,
-                                   ref.value = ref.value,
-                                   ...)
-  output
+  univariable.data.frame(data = d,
+                         outcome = outcome,
+                         indepts = indepts,
+                         model = model,
+                         effect.values = effect.values,
+                         conf.level = conf.level,
+                         conf.brackets = conf.brackets,
+                         conf.separator = conf.separator,
+                         digits.pvalue = digits.pvalue,
+                         digits.effect = digits.effect,
+                         ref.value = ref.value,
+                         ...)
 }
 
+
+#' @rdname univariable
+#' @export
+univariable.coxph <- function(data,
+                              outcome = NULL,
+                              time = NULL,
+                              indepts = NULL,
+                              model = c("cox"),
+                              effect.values =  c("b", "se", "effect", "p"),
+                              conf.level = 0.95,
+                              conf.brackets = NULL,
+                              conf.separator = NULL,
+                              digits.pvalue = 3,
+                              digits.effect = 2,
+                              ref.value = "Reference",
+                              ...){
+
+  d <- data$data
+
+  if(is.null(d)){
+    stop("Use 'cox' function fit a Cox proportional hazards regression instead of 'coxph'.", call. = FALSE)
+  }
+
+  time <- all.vars(fit$formula)[1]
+  outcome <- all.vars(fit$formula)[2]
+  indepts <-  all.vars(fit$formula)[-c(1:2)]
+
+  univariable.data.frame(data = d,
+                         outcome = outcome,
+                         time = time,
+                         indepts = indepts,
+                         model = model,
+                         effect.values = effect.values,
+                         conf.level = conf.level,
+                         conf.brackets = conf.brackets,
+                         conf.separator = conf.separator,
+                         digits.pvalue = digits.pvalue,
+                         digits.effect = digits.effect,
+                         ref.value = ref.value,
+                         ...)
+
+}
 

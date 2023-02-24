@@ -195,9 +195,11 @@ associate <- function(data,
 
   # Output title
   title <- switch(model,
-                  linear  = "multiple linear regression model",
-                  logit   = "binary logistc regression model",
-                  cox     = "Cox proportional hazards regression model",
+                  linear  = "multiple linear regression",
+                  logit   = "binary logistc regression",
+                  poson   = "modified Poissson regression",
+                  logbinom = "log-binomial regression",
+                  cox     = "Cox proportional hazards regression",
                   default = "")
   title <- sprintf("Table: Association between %s and %s using %s",
                    label.exposure,
@@ -206,9 +208,11 @@ associate <- function(data,
 
   abbr <- switch(model,
                 linear  = "Abbreviation: CI, confidence interval.",
-                logit   = "Abbreviation: OR, adds ratio; CI, confidence interval.",
+                logit   = "Abbreviation: OR, odds ratio; CI, confidence interval.",
+                poson   = "Abbreviation: RR, risk ratio; CI, confidence interval.",
+                logbinom = "Abbreviation: RR, risk ratio; CI, confidence interval.",
                 cox     = "Abbreviation: HR, hazard ratio; CI, confidence interval.",
-                default = "")
+                "Abbreviation: CI, confidence interval.")
 
   # Output notes
   notes <- sapply(covariates, function(x){

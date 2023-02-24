@@ -5,6 +5,7 @@
 \alias{univariable.data.frame}
 \alias{univariable.lm}
 \alias{univariable.glm}
+\alias{univariable.coxph}
 \title{Univariable analysis}
 \usage{
 univariable(
@@ -61,6 +62,22 @@ univariable(
   time = NULL,
   indepts = NULL,
   model = c("linear", "logit", "poson", "logbinom"),
+  effect.values = c("b", "se", "effect", "p"),
+  conf.level = 0.95,
+  conf.brackets = NULL,
+  conf.separator = NULL,
+  digits.pvalue = 3,
+  digits.effect = 2,
+  ref.value = "Reference",
+  ...
+)
+
+\method{univariable}{coxph}(
+  data,
+  outcome = NULL,
+  time = NULL,
+  indepts = NULL,
+  model = c("cox"),
   effect.values = c("b", "se", "effect", "p"),
   conf.level = 0.95,
   conf.brackets = NULL,

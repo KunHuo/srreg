@@ -5,6 +5,7 @@
 \alias{multivariable.data.frame}
 \alias{multivariable.lm}
 \alias{multivariable.glm}
+\alias{multivariable.coxph}
 \title{Multivariable analysis}
 \usage{
 multivariable(
@@ -61,6 +62,22 @@ multivariable(
   time = NULL,
   indepts = NULL,
   model = c("linear", "logit", "poson", "logbinom"),
+  effect.values = c("b", "se", "effect", "p"),
+  conf.level = 0.95,
+  conf.brackets = NULL,
+  conf.separator = NULL,
+  digits.pvalue = 3,
+  digits.effect = 2,
+  ref.value = "Referrence",
+  ...
+)
+
+\method{multivariable}{coxph}(
+  data,
+  outcome = NULL,
+  time = NULL,
+  indepts = NULL,
+  model = c("cox"),
   effect.values = c("b", "se", "effect", "p"),
   conf.level = 0.95,
   conf.brackets = NULL,

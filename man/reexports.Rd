@@ -5,6 +5,7 @@
 \alias{reexports}
 \alias{typeset}
 \alias{write_docx}
+\alias{Surv}
 \title{Objects exported from other packages}
 \keyword{internal}
 \description{
@@ -13,5 +14,7 @@ below to see their documentation.
 
 \describe{
   \item{srmisc}{\code{\link[srmisc]{typeset}}, \code{\link[srmisc]{write_docx}}}
+
+  \item{survival}{\code{\link[survival]{Surv}}}
 }}
 

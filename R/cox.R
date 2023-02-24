@@ -15,5 +15,7 @@
 #' @return an object of class coxph representing the fit.
 #' @export
 cox <- function(data, formula, ...){
-  survival::coxph(data = data, formula = formula, ...)
+  fit <- survival::coxph(data = data, formula = formula, ...)
+  fit$data <- data
+  fit
 }
