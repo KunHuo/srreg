@@ -6,6 +6,5 @@ poson <- function(data, formula, ...){
   fit <- stats::glm(formula = formula,
              data = data,
              family = stats::poisson(link = "log"), ...)
-  class(fit) <- c("poson", class(fit))
   fit
 }

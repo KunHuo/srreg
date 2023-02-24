@@ -3,7 +3,8 @@
 \name{multivariable}
 \alias{multivariable}
 \alias{multivariable.data.frame}
-\alias{multivariable.linear}
+\alias{multivariable.lm}
+\alias{multivariable.glm}
 \title{Multivariable analysis}
 \usage{
 multivariable(
@@ -38,7 +39,23 @@ multivariable(
   ...
 )
 
-\method{multivariable}{linear}(
+\method{multivariable}{lm}(
+  data,
+  outcome = NULL,
+  time = NULL,
+  indepts = NULL,
+  model = c("linear"),
+  effect.values = c("n", "b", "se", "effect", "p"),
+  conf.level = 0.95,
+  conf.brackets = NULL,
+  conf.separator = NULL,
+  digits.pvalue = 3,
+  digits.effect = 2,
+  ref.value = 0,
+  ...
+)
+
+\method{multivariable}{glm}(
   data,
   outcome = NULL,
   time = NULL,

@@ -15,7 +15,5 @@
 #' of class c("mlm", "lm").
 #' @export
 linear <- function(data, formula, ...){
-  fit <- stats::lm(data = data, formula = formula, ...)
-  class(fit) <- c("linear", class(fit))
-  fit
+  stats::lm(data = data, formula = formula, ...)
 }

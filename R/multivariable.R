@@ -63,20 +63,8 @@ multivariable.data.frame <- function(data,
                   digits.effect = digits.effect,
                   ref.value = ref.value)
 
-  title <- switch(model,
-                  linear  = "Table: Multivariable multiple linear regression model",
-                  logit   = "Table: Multivariable binary logistc regression model",
-                  cox     = "Table: Multivariable Cox proportional hazards regression model",
-                  default = "Table: Multivariable analysis")
-
-  notes <- switch(model,
-                  linear  = "Abbreviation: CI, confidence interval.",
-                  logit   = "Abbreviation: OR, adds ratio; CI, confidence interval.",
-                  cox     = "Abbreviation: HR, hazard ratio; CI, confidence interval.",
-                  default = NULL)
-
-  attr(output, "title") <- title
-  attr(output, "note")  <- notes
+  attr(output, "title") <- multivariable_title(model)
+  attr(output, "note")  <- multivariable_note(model)
   class(output) <- c("srreg", "data.frame")
   output
 }
@@ -84,7 +72,7 @@ multivariable.data.frame <- function(data,
 
 #' @rdname multivariable
 #' @export
-multivariable.linear <- function(data,
+multivariable.lm <- function(data,
                                  outcome = NULL,
                                  time = NULL,
                                  indepts = NULL,
@@ -95,8 +83,40 @@ multivariable.linear <- function(data,
                                  conf.separator = NULL,
                                  digits.pvalue = 3,
                                  digits.effect = 2,
-                                 ref.value = 0,
+                                 ref.value = "Referrence",
                                 ...) {
+  output <- srmisc::typeset(data,
+                            select = effect.values,
+                            conf.level = conf.level,
+                            conf.brackets = conf.brackets,
+                            conf.separator = conf.separator,
+                            digits.pvalue = digits.pvalue,
+                            digits.effect = digits.effect,
+                            ref.value = ref.value,
+                            ...)
+
+  attr(output, "title") <- multivariable_title(model)
+  attr(output, "note")  <- multivariable_note(model)
+  class(output) <- c("srreg", "data.frame")
+  output
+}
+
+
+#' @rdname multivariable
+#' @export
+multivariable.glm <- function(data,
+                             outcome = NULL,
+                             time = NULL,
+                             indepts = NULL,
+                             model = c("linear", "logit", "poson", "logbinom"),
+                             effect.values =  c("n", "b", "se", "effect", "p"),
+                             conf.level = 0.95,
+                             conf.brackets = NULL,
+                             conf.separator = NULL,
+                             digits.pvalue = 3,
+                             digits.effect = 2,
+                             ref.value = "Referrence",
+                             ...) {
 
   output <- srmisc::typeset(data,
                             select = effect.values,
@@ -108,8 +128,45 @@ multivariable.linear <- function(data,
                             ref.value = ref.value,
                             ...)
 
-  attr(output, "title") <- "Table: Multivariable multiple linear regression model"
-  attr(output, "note")  <- "Abbreviation: CI, confidence interval."
+  if(data$family$family == "gaussian"){
+    model <- "linear"
+  }else if(data$family$family == "binomial"){
+    if(data$family$link == "logit"){
+      model <- "logit"
+    }else if(data$family$link == "log"){
+      model <- "logbinom"
+    }else{
+      model <- "logit"
+    }
+  }else if(data$family$family == "poisson"){
+    model <- "poson"
+  }
+
+  attr(output, "title") <- multivariable_title(model)
+  attr(output, "note")  <- multivariable_note(model)
   class(output) <- c("srreg", "data.frame")
   output
 }
+
+
+multivariable_title <- function(model){
+  switch(model,
+         linear  = "Table: Multivariable linear regression model",
+         logit   = "Table: Multivariable binary logistc regression model",
+         poson   = "Table: Multivariable modified Poissson regression",
+         logbinom = "Table: Multivariable log-binomial regression",
+         cox     = "Table: Multivariable Cox proportional hazards regression model",
+         "Table: Multivariable analysis")
+}
+
+
+multivariable_note <- function(model){
+ switch(model,
+        linear  = "Abbreviation: CI, confidence interval.",
+        logit   = "Abbreviation: OR, adds ratio; CI, confidence interval.",
+        poson   = "Abbreviation: RR, risk ratio; CI, confidence interval.",
+        logbinom = "Abbreviation: RR, risk ratio; CI, confidence interval.",
+        cox     = "Abbreviation: HR, hazard ratio; CI, confidence interval.",
+        "Abbreviation: CI, confidence interval.")
+}
+

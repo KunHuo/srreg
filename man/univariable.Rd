@@ -3,7 +3,8 @@
 \name{univariable}
 \alias{univariable}
 \alias{univariable.data.frame}
-\alias{univariable.linear}
+\alias{univariable.lm}
+\alias{univariable.glm}
 \title{Univariable analysis}
 \usage{
 univariable(
@@ -38,7 +39,7 @@ univariable(
   ...
 )
 
-\method{univariable}{linear}(
+\method{univariable}{lm}(
   data,
   outcome = NULL,
   time = NULL,
@@ -50,7 +51,23 @@ univariable(
   conf.separator = NULL,
   digits.pvalue = 3,
   digits.effect = 2,
-  ref.value = 0,
+  ref.value = "Reference",
+  ...
+)
+
+\method{univariable}{glm}(
+  data,
+  outcome = NULL,
+  time = NULL,
+  indepts = NULL,
+  model = c("linear", "logit", "poson", "logbinom"),
+  effect.values = c("net", "b", "se", "effect", "p"),
+  conf.level = 0.95,
+  conf.brackets = NULL,
+  conf.separator = NULL,
+  digits.pvalue = 3,
+  digits.effect = 2,
+  ref.value = "Reference",
   ...
 )
 }

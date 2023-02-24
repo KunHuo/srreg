@@ -88,16 +88,20 @@ univariable.data.frame <- function(data,
   output <- do.call(rbind, output)
 
   title <- switch(model,
-                  linear  = "Table: Univariable multiple linear regression model",
-                  logit   = "Table: Univariable binary logistc regression model",
-                  cox     = "Table: Univariable Cox proportional hazards regression model",
+                  linear  = "Table: Univariable linear regression",
+                  logit   = "Table: Univariable binary logistc regression",
+                  cox     = "Table: Univariable Cox proportional hazards regression",
+                  poson   = "Table: Univariable modified Poissson regression",
+                  logbinom = "Table: Univariable log-binomial regression",
                   "Table: Univariable analysis")
 
   notes <- switch(model,
                   linear  = "Abbreviation: CI, confidence interval.",
-                  logit   = "Abbreviation: OR, adds ratio; CI, confidence interval.",
+                  logit   = "Abbreviation: OR, odds ratio; CI, confidence interval.",
+                  poson   = "Abbreviation: RR, risk ratio; CI, confidence interval.",
+                  logbinom = "Abbreviation: RR, risk ratio; CI, confidence interval.",
                   cox     = "Abbreviation: HR, hazard ratio; CI, confidence interval.",
-                  default = NULL)
+                  "Abbreviation: CI, confidence interval.")
 
   attr(output, "title") <- title
   attr(output, "note")  <- notes
@@ -108,7 +112,7 @@ univariable.data.frame <- function(data,
 
 #' @rdname univariable
 #' @export
-univariable.linear <- function(data,
+univariable.lm <- function(data,
                                outcome = NULL,
                                time = NULL,
                                indepts = NULL,
@@ -119,11 +123,11 @@ univariable.linear <- function(data,
                                conf.separator = NULL,
                                digits.pvalue = 3,
                                digits.effect = 2,
-                               ref.value = 0,
+                               ref.value = "Reference",
                                ...){
    d <- data$model
    outcome <- all.vars(data$terms)[1]
-   indepts <- all.vars(attr(fit$model, "terms"))[-1]
+   indepts <- all.vars(attr(data$model, "terms"))[-1]
 
    output <- univariable.data.frame(data = d,
                           outcome = outcome,
@@ -137,11 +141,59 @@ univariable.linear <- function(data,
                           digits.effect = digits.effect,
                           ref.value = ref.value,
                           ...)
-
-   attr(output, "title") <- "Table: Univariable multiple linear regression model"
-   attr(output, "note")  <- "Abbreviation: CI, confidence interval."
-   class(output) <- c("srreg", "data.frame")
+   # attr(output, "title") <- "Table: Univariable linear regression model"
+   # attr(output, "note")  <- "Abbreviation: CI, confidence interval."
+   # class(output) <- c("srreg", "data.frame")
    output
+}
+
+
+#' @rdname univariable
+#' @export
+univariable.glm <- function(data,
+                           outcome = NULL,
+                           time = NULL,
+                           indepts = NULL,
+                           model = c("linear", "logit", "poson", "logbinom"),
+                           effect.values =  c("net", "b", "se", "effect", "p"),
+                           conf.level = 0.95,
+                           conf.brackets = NULL,
+                           conf.separator = NULL,
+                           digits.pvalue = 3,
+                           digits.effect = 2,
+                           ref.value = "Reference",
+                           ...){
+  d <- data$data
+  outcome <- all.vars(data$formula)[1]
+  indepts <- all.vars(data$formula)[-1]
+
+  if(data$family$family == "gaussian"){
+    model <- "linear"
+  }else if(data$family$family == "binomial"){
+    if(data$family$link == "logit"){
+      model <- "logit"
+    }else if(data$family$link == "log"){
+      model <- "logbinom"
+    }else{
+      model <- "logit"
+    }
+  }else if(data$family$family == "poisson"){
+    model <- "poson"
+  }
+
+  output <- univariable.data.frame(data = d,
+                                   outcome = outcome,
+                                   indepts = indepts,
+                                   model = model,
+                                   effect.values = effect.values,
+                                   conf.level = conf.level,
+                                   conf.brackets = conf.brackets,
+                                   conf.separator = conf.separator,
+                                   digits.pvalue = digits.pvalue,
+                                   digits.effect = digits.effect,
+                                   ref.value = ref.value,
+                                   ...)
+  output
 }
 
 
