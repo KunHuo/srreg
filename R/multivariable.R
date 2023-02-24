@@ -20,7 +20,11 @@ multivariable <- function(data,
   UseMethod("multivariable")
 }
 
-#' @rdname multivariable
+#' Multivariable analysis for data.frame
+#'
+#' @inheritParams multivariable
+#' @inherit multivariable return
+#' @keywords internal
 #' @export
 multivariable.data.frame <- function(data,
                                      outcome = NULL,
@@ -70,7 +74,11 @@ multivariable.data.frame <- function(data,
 }
 
 
-#' @rdname multivariable
+#' Multivariable analysis for lm
+#'
+#' @inheritParams multivariable
+#' @inherit multivariable return
+#' @keywords internal
 #' @export
 multivariable.lm <- function(data,
                                  outcome = NULL,
@@ -102,7 +110,11 @@ multivariable.lm <- function(data,
 }
 
 
-#' @rdname multivariable
+#' Multivariable analysis for glm
+#'
+#' @inheritParams multivariable
+#' @inherit multivariable return
+#' @keywords internal
 #' @export
 multivariable.glm <- function(data,
                              outcome = NULL,
@@ -149,7 +161,11 @@ multivariable.glm <- function(data,
 }
 
 
-#' @rdname multivariable
+#' Multivariable analysis for coxph
+#'
+#' @inheritParams multivariable
+#' @inherit multivariable return
+#' @keywords internal
 #' @export
 multivariable.coxph <- function(data,
                                 outcome = NULL,

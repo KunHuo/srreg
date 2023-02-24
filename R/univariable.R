@@ -38,7 +38,11 @@ univariable <- function(data,
 }
 
 
-#' @rdname univariable
+#' Univariable analysis for data.frame
+#'
+#' @inheritParams univariable
+#' @inherit univariable return
+#' @keywords internal
 #' @export
 univariable.data.frame <- function(data,
                                    outcome = NULL,
@@ -110,7 +114,11 @@ univariable.data.frame <- function(data,
 }
 
 
-#' @rdname univariable
+#' Univariable analysis for lm
+#'
+#' @inheritParams univariable
+#' @inherit univariable return
+#' @keywords internal
 #' @export
 univariable.lm <- function(data,
                                outcome = NULL,
@@ -144,7 +152,12 @@ univariable.lm <- function(data,
 }
 
 
-#' @rdname univariable
+
+#' Univariable analysis for glm
+#'
+#' @inheritParams univariable
+#' @inherit univariable return
+#' @keywords internal
 #' @export
 univariable.glm <- function(data,
                            outcome = NULL,
@@ -192,7 +205,11 @@ univariable.glm <- function(data,
 }
 
 
-#' @rdname univariable
+#' Univariable analysis for coxph
+#'
+#' @inheritParams univariable
+#' @inherit univariable return
+#' @keywords internal
 #' @export
 univariable.coxph <- function(data,
                               outcome = NULL,
@@ -214,9 +231,9 @@ univariable.coxph <- function(data,
     stop("Use 'cox' function fit a Cox proportional hazards regression instead of 'coxph'.", call. = FALSE)
   }
 
-  time <- all.vars(fit$formula)[1]
-  outcome <- all.vars(fit$formula)[2]
-  indepts <-  all.vars(fit$formula)[-c(1:2)]
+  time <- all.vars(data$formula)[1]
+  outcome <- all.vars(data$formula)[2]
+  indepts <-  all.vars(data$formula)[-c(1:2)]
 
   univariable.data.frame(data = d,
                          outcome = outcome,
