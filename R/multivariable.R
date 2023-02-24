@@ -8,15 +8,33 @@ multivariable <- function(data,
                           outcome = NULL,
                           time = NULL,
                           indepts = NULL,
-                          model = c("auto", "linear", "logit", "cox", "poisson", "logbinom", "multinom"),
+                          model = c("auto", "linear", "logit", "cox", "poson", "logbinom", "multinom"),
                           effect.values =  c("net", "b", "se", "effect", "p"),
                           conf.level = 0.95,
                           conf.brackets = NULL,
                           conf.separator = NULL,
                           digits.pvalue = 3,
                           digits.effect = 2,
-                          ref.value = 1,
-                          ...) {
+                          ref.value = "Referrence",
+                          ...){
+  UseMethod("multivariable")
+}
+
+#' @rdname multivariable
+#' @export
+multivariable.data.frame <- function(data,
+                                     outcome = NULL,
+                                     time = NULL,
+                                     indepts = NULL,
+                                     model = c("auto", "linear", "logit", "cox", "poson", "logbinom", "multinom"),
+                                     effect.values =  c("net", "b", "se", "effect", "p"),
+                                     conf.level = 0.95,
+                                     conf.brackets = NULL,
+                                     conf.separator = NULL,
+                                     digits.pvalue = 3,
+                                     digits.effect = 2,
+                                     ref.value = "Referrence",
+                                     ...) {
 
   outcome  <- srmisc::select_variable(data, outcome)
   time     <- srmisc::select_variable(data, time)
@@ -59,6 +77,39 @@ multivariable <- function(data,
 
   attr(output, "title") <- title
   attr(output, "note")  <- notes
+  class(output) <- c("srreg", "data.frame")
+  output
+}
+
+
+#' @rdname multivariable
+#' @export
+multivariable.linear <- function(data,
+                                 outcome = NULL,
+                                 time = NULL,
+                                 indepts = NULL,
+                                 model = c("linear"),
+                                 effect.values =  c("n", "b", "se", "effect", "p"),
+                                 conf.level = 0.95,
+                                 conf.brackets = NULL,
+                                 conf.separator = NULL,
+                                 digits.pvalue = 3,
+                                 digits.effect = 2,
+                                 ref.value = 0,
+                                ...) {
+
+  output <- srmisc::typeset(data,
+                            select = effect.values,
+                            conf.level = conf.level,
+                            conf.brackets = conf.brackets,
+                            conf.separator = conf.separator,
+                            digits.pvalue = digits.pvalue,
+                            digits.effect = digits.effect,
+                            ref.value = ref.value,
+                            ...)
+
+  attr(output, "title") <- "Table: Multivariable multiple linear regression model"
+  attr(output, "note")  <- "Abbreviation: CI, confidence interval."
   class(output) <- c("srreg", "data.frame")
   output
 }

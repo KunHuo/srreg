@@ -4,5 +4,6 @@
 #' @seealso [nnet::multinom()]
 #' @export
 multinom <- function(data, formula, ...){
-  nnet::multinom(formula = formula, data = data, ...)
+  fit <- nnet::multinom(formula = formula, data = data, ...)
+  fit
 }

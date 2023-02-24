@@ -22,18 +22,37 @@
 #' @return a data frame.
 #' @export
 univariable <- function(data,
-                       outcome = NULL,
-                       time = NULL,
-                       indepts = NULL,
-                       model = c("auto", "linear", "logit", "cox", "poisson", "logbinom", "multinom"),
-                       effect.values =  c("net", "b", "se", "effect", "p"),
-                       conf.level = 0.95,
-                       conf.brackets = NULL,
-                       conf.separator = NULL,
-                       digits.pvalue = 3,
-                       digits.effect = 2,
-                       ref.value = 1,
-                       ...){
+                        outcome = NULL,
+                        time = NULL,
+                        indepts = NULL,
+                        model = c("auto", "linear", "logit", "cox", "poson", "logbinom", "multinom"),
+                        effect.values =  c("net", "b", "se", "effect", "p"),
+                        conf.level = 0.95,
+                        conf.brackets = NULL,
+                        conf.separator = NULL,
+                        digits.pvalue = 3,
+                        digits.effect = 2,
+                        ref.value = "Reference",
+                        ...){
+  UseMethod("univariable")
+}
+
+
+#' @rdname univariable
+#' @export
+univariable.data.frame <- function(data,
+                                   outcome = NULL,
+                                   time = NULL,
+                                   indepts = NULL,
+                                   model = c("auto", "linear", "logit", "cox", "poson", "logbinom", "multinom"),
+                                   effect.values =  c("net", "b", "se", "effect", "p"),
+                                   conf.level = 0.95,
+                                   conf.brackets = NULL,
+                                   conf.separator = NULL,
+                                   digits.pvalue = 3,
+                                   digits.effect = 2,
+                                   ref.value = "Reference",
+                                   ...){
 
   outcome  <- srmisc::select_variable(data, outcome)
   time     <- srmisc::select_variable(data, time)
@@ -85,3 +104,44 @@ univariable <- function(data,
   class(output) <- c("srreg", "data.frame")
   output
 }
+
+
+#' @rdname univariable
+#' @export
+univariable.linear <- function(data,
+                               outcome = NULL,
+                               time = NULL,
+                               indepts = NULL,
+                               model = c("linear"),
+                               effect.values =  c("n", "b", "se", "effect", "p"),
+                               conf.level = 0.95,
+                               conf.brackets = NULL,
+                               conf.separator = NULL,
+                               digits.pvalue = 3,
+                               digits.effect = 2,
+                               ref.value = 0,
+                               ...){
+   d <- data$model
+   outcome <- all.vars(data$terms)[1]
+   indepts <- all.vars(attr(fit$model, "terms"))[-1]
+
+   output <- univariable.data.frame(data = d,
+                          outcome = outcome,
+                          indepts = indepts,
+                          model = model,
+                          effect.values = effect.values,
+                          conf.level = conf.level,
+                          conf.brackets = conf.brackets,
+                          conf.separator = conf.separator,
+                          digits.pvalue = digits.pvalue,
+                          digits.effect = digits.effect,
+                          ref.value = ref.value,
+                          ...)
+
+   attr(output, "title") <- "Table: Univariable multiple linear regression model"
+   attr(output, "note")  <- "Abbreviation: CI, confidence interval."
+   class(output) <- c("srreg", "data.frame")
+   output
+}
+
+

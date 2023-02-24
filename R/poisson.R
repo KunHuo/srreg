@@ -3,7 +3,9 @@
 #' @inheritParams logit
 #' @export
 poson <- function(data, formula, ...){
-  stats::glm(formula = formula,
+  fit <- stats::glm(formula = formula,
              data = data,
              family = stats::poisson(link = "log"), ...)
+  class(fit) <- c("poson", class(fit))
+  fit
 }

@@ -10,7 +10,9 @@
 #' class "lm".
 #' @export
 logit <- function(data, formula, ...){
-  stats::glm(formula = formula,
+  fit <- stats::glm(formula = formula,
              data = data,
              family = stats::binomial(link = "logit"), ...)
+  class(fit) <- c("logit", class(fit))
+  fit
 }

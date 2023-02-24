@@ -10,7 +10,7 @@ associate(
   time = NULL,
   exposure = NULL,
   covariates = NULL,
-  model = c("auto", "linear", "logit", "cox", "poisson", "logbinom", "multinom"),
+  model = c("auto", "linear", "logit", "cox", "poson", "logbinom", "multinom"),
   args = list(),
   p.trend = TRUE,
   n.quantile = NULL,
@@ -21,7 +21,7 @@ associate(
   conf.separator = NULL,
   digits.pvalue = 3,
   digits.effect = 2,
-  ref.value = 1,
+  ref.value = "Reference",
   ...
 )
 }

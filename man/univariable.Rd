@@ -2,6 +2,8 @@
 % Please edit documentation in R/univariable.R
 \name{univariable}
 \alias{univariable}
+\alias{univariable.data.frame}
+\alias{univariable.linear}
 \title{Univariable analysis}
 \usage{
 univariable(
@@ -9,14 +11,46 @@ univariable(
   outcome = NULL,
   time = NULL,
   indepts = NULL,
-  model = c("auto", "linear", "logit", "cox", "poisson", "logbinom", "multinom"),
+  model = c("auto", "linear", "logit", "cox", "poson", "logbinom", "multinom"),
   effect.values = c("net", "b", "se", "effect", "p"),
   conf.level = 0.95,
   conf.brackets = NULL,
   conf.separator = NULL,
   digits.pvalue = 3,
   digits.effect = 2,
-  ref.value = 1,
+  ref.value = "Reference",
+  ...
+)
+
+\method{univariable}{data.frame}(
+  data,
+  outcome = NULL,
+  time = NULL,
+  indepts = NULL,
+  model = c("auto", "linear", "logit", "cox", "poson", "logbinom", "multinom"),
+  effect.values = c("net", "b", "se", "effect", "p"),
+  conf.level = 0.95,
+  conf.brackets = NULL,
+  conf.separator = NULL,
+  digits.pvalue = 3,
+  digits.effect = 2,
+  ref.value = "Reference",
+  ...
+)
+
+\method{univariable}{linear}(
+  data,
+  outcome = NULL,
+  time = NULL,
+  indepts = NULL,
+  model = c("linear"),
+  effect.values = c("n", "b", "se", "effect", "p"),
+  conf.level = 0.95,
+  conf.brackets = NULL,
+  conf.separator = NULL,
+  digits.pvalue = 3,
+  digits.effect = 2,
+  ref.value = 0,
   ...
 )
 }

@@ -2,6 +2,8 @@
 % Please edit documentation in R/multivariable.R
 \name{multivariable}
 \alias{multivariable}
+\alias{multivariable.data.frame}
+\alias{multivariable.linear}
 \title{Multivariable analysis}
 \usage{
 multivariable(
@@ -9,14 +11,46 @@ multivariable(
   outcome = NULL,
   time = NULL,
   indepts = NULL,
-  model = c("auto", "linear", "logit", "cox", "poisson", "logbinom", "multinom"),
+  model = c("auto", "linear", "logit", "cox", "poson", "logbinom", "multinom"),
   effect.values = c("net", "b", "se", "effect", "p"),
   conf.level = 0.95,
   conf.brackets = NULL,
   conf.separator = NULL,
   digits.pvalue = 3,
   digits.effect = 2,
-  ref.value = 1,
+  ref.value = "Referrence",
+  ...
+)
+
+\method{multivariable}{data.frame}(
+  data,
+  outcome = NULL,
+  time = NULL,
+  indepts = NULL,
+  model = c("auto", "linear", "logit", "cox", "poson", "logbinom", "multinom"),
+  effect.values = c("net", "b", "se", "effect", "p"),
+  conf.level = 0.95,
+  conf.brackets = NULL,
+  conf.separator = NULL,
+  digits.pvalue = 3,
+  digits.effect = 2,
+  ref.value = "Referrence",
+  ...
+)
+
+\method{multivariable}{linear}(
+  data,
+  outcome = NULL,
+  time = NULL,
+  indepts = NULL,
+  model = c("linear"),
+  effect.values = c("n", "b", "se", "effect", "p"),
+  conf.level = 0.95,
+  conf.brackets = NULL,
+  conf.separator = NULL,
+  digits.pvalue = 3,
+  digits.effect = 2,
+  ref.value = 0,
   ...
 )
 }

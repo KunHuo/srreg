@@ -1,7 +1,7 @@
 auto_model <- function(data,
                         outcome = NULL,
                         time = NULL,
-                        model = c("auto", "linear", "logit", "cox", "poisson", "logbinom", "multinom")){
+                        model = c("auto", "linear", "logit", "cox", "poson", "logbinom", "multinom")){
 
   model <- match.arg(model)
 
@@ -46,8 +46,6 @@ model_names <- function(model){
          logbinom = "",
          multinom = "")
 }
-
-
 
 
 
