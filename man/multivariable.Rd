@@ -13,7 +13,7 @@ multivariable(
   time = NULL,
   indepts = NULL,
   model = c("auto", "linear", "logit", "cox", "poson", "logbinom", "multinom"),
-  effect.values = c("net", "b", "se", "effect", "p"),
+  effect.values = c("b", "se", "effect", "p"),
   conf.level = 0.95,
   conf.brackets = NULL,
   conf.separator = NULL,
@@ -29,7 +29,7 @@ multivariable(
   time = NULL,
   indepts = NULL,
   model = c("auto", "linear", "logit", "cox", "poson", "logbinom", "multinom"),
-  effect.values = c("net", "b", "se", "effect", "p"),
+  effect.values = c("b", "se", "effect", "p"),
   conf.level = 0.95,
   conf.brackets = NULL,
   conf.separator = NULL,
@@ -45,13 +45,13 @@ multivariable(
   time = NULL,
   indepts = NULL,
   model = c("linear"),
-  effect.values = c("n", "b", "se", "effect", "p"),
+  effect.values = c("b", "se", "effect", "p"),
   conf.level = 0.95,
   conf.brackets = NULL,
   conf.separator = NULL,
   digits.pvalue = 3,
   digits.effect = 2,
-  ref.value = 0,
+  ref.value = "Referrence",
   ...
 )
 
@@ -60,14 +60,14 @@ multivariable(
   outcome = NULL,
   time = NULL,
   indepts = NULL,
-  model = c("linear"),
-  effect.values = c("n", "b", "se", "effect", "p"),
+  model = c("linear", "logit", "poson", "logbinom"),
+  effect.values = c("b", "se", "effect", "p"),
   conf.level = 0.95,
   conf.brackets = NULL,
   conf.separator = NULL,
   digits.pvalue = 3,
   digits.effect = 2,
-  ref.value = 0,
+  ref.value = "Referrence",
   ...
 )
 }
