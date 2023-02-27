@@ -28,4 +28,6 @@
 #' multivariable(fit)
 linear <- function(data, formula, ...){
   stats::lm(data = data, formula = formula, ...)
+
 }
+
