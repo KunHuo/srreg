@@ -24,3 +24,16 @@ linear is used to fit linear models, including multivariate ones. It can be
 used to carry out regression, single stratum analysis of variance and analysis
 of covariance (although aov may provide a more convenient interface for these).
 }
+\examples{
+# Fit a linear model
+fit <- linear(iris, Sepal.Length ~ .)
+
+Coefficients of univariable linear regression
+univariable(fit)
+
+# Coefficients of multivariable linear regression
+multivariable(fit)
+}
+\seealso{
+\code{\link[=lm]{lm()}}
+}

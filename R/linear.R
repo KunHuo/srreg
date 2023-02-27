@@ -14,6 +14,18 @@
 #' @return an object of class "lm" or for multivariate ('multiple') responses
 #' of class c("mlm", "lm").
 #' @export
+#'
+#' @seealso [lm()]
+#'
+#' @examples
+#' # Fit a linear model
+#' fit <- linear(iris, Sepal.Length ~ .)
+#'
+#' Coefficients of univariable linear regression
+#' univariable(fit)
+#'
+#' # Coefficients of multivariable linear regression
+#' multivariable(fit)
 linear <- function(data, formula, ...){
   stats::lm(data = data, formula = formula, ...)
 }

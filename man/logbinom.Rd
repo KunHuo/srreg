@@ -23,3 +23,24 @@ variable, then positive is defined as the largest value.}
 \description{
 Fitting log-binomial models
 }
+\examples{
+library(srmisc)
+
+data("cancer")
+
+cancer$sex  <- factor(cancer$sex)
+cancer$race <- factor(cancer$race)
+cancer$meta <- factor(cancer$meta)
+
+# Fit a log-binomial model
+fit <- logbinom(cancer, meta ~ age + sex + race)
+
+# Univariable log-binomial regression
+univariable(fit)
+
+# Multivariable log-binomial regression
+multivariable(fit)
+}
+\seealso{
+[glm[]]
+}

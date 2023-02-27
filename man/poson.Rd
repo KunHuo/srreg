@@ -23,3 +23,24 @@ variable, then positive is defined as the largest value.}
 \description{
 Fitting poisson models
 }
+\examples{
+library(srmisc)
+
+data("cancer")
+
+cancer$sex  <- factor(cancer$sex)
+cancer$race <- factor(cancer$race)
+cancer$meta <- factor(cancer$meta)
+
+# Fit a modified Poissson model
+fit <- poson(cancer, meta ~ age + sex + race + size)
+
+# Univariable modified Poissson regression
+univariable(fit)
+
+# Multivariable modified Poissson regression
+multivariable(fit)
+}
+\seealso{
+[glm[]]
+}

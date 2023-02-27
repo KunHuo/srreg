@@ -27,3 +27,24 @@ class "lm".
 \description{
 Fitting logistic models
 }
+\examples{
+library(srmisc)
+
+data("cancer")
+
+cancer$sex  <- factor(cancer$sex)
+cancer$race <- factor(cancer$race)
+cancer$meta <- factor(cancer$meta)
+
+# Fit a binary logistic model
+fit <- logit(cancer, meta ~ age + sex + race + size)
+
+# Univariable binary logistc regression
+univariable(fit)
+
+# Multivariable binary logistc regression
+multivariable(fit)
+}
+\seealso{
+\code{\link[=glm]{glm()}}
+}
