@@ -49,7 +49,7 @@ model_names <- function(model){
 
 
 
-LRT <- function(data, outcome, time, exposure, covariates, strata, model, args = list(), digits.pvalue = 3){
+LRT <- function(data, outcome, time, exposure, covariates, strata, positive, model, args = list(), digits.pvalue = 3){
 
   model <- auto_model(data, outcome = outcome, time = time, model = model)
 
@@ -62,8 +62,13 @@ LRT <- function(data, outcome, time, exposure, covariates, strata, model, args =
     frm1 <- create_formula(c(time, outcome), c(exposure, svar, covariates))
     frm2 <- create_formula2(c(time, outcome), exposure, svar, covariates)
 
-    fit1 <- srmisc::do_call(model, data = data, formula = frm1, args)
-    fit2 <- srmisc::do_call(model, data = data, formula = frm2, args)
+   if(model == "linear"){
+     fit1 <- srmisc::do_call(model, data = data, formula = frm1, args)
+     fit2 <- srmisc::do_call(model, data = data, formula = frm2, args)
+   }else{
+     fit1 <- srmisc::do_call(model, data = data, formula = frm1, positive = positive, args)
+     fit2 <- srmisc::do_call(model, data = data, formula = frm2, positive = positive, args)
+   }
 
     pvalue <- stats::anova(fit1, fit2, test = "LRT")
     pvalue <- srmisc::fmt_pvalue(pvalue[, ncol(pvalue)][2], digits = digits.pvalue)
@@ -102,5 +107,24 @@ create_formula2 <- function(outcome, exposure, strata, adjusted = NULL){
   frm <- paste(outcome, frm, sep = " ~ ")
   frm <- stats::as.formula(frm)
   frm
+}
+
+positive_event <- function(data, outcome, positive = "auto"){
+
+  if(is.null(positive)){
+    data
+  }else{
+    if(positive == "auto"){
+      if(is.numeric(data[[outcome]])){
+        positive <- max(data[[outcome]])
+      }else if(is.factor(data[[outcome]])){
+        positive <- levels(data[[outcome]])[2]
+      }else{
+        stop("You need to specify the positive event of outcome.", call. = FALSE)
+      }
+    }
+    data[[outcome]] <-  ifelse(data[[outcome]] == positive, 1, 0)
+    data
+  }
 }
 

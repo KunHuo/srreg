@@ -8,6 +8,10 @@
 #' @param time time variable name, for Cox regression.
 #' @param exposure exposure variable name.
 #' @param covariates covariate names, a vector or a list.
+#' @param positive in which positive of outcome variable to make the comparison.
+#' By default, positive is automatically defined. If outcome is a factor variable,
+#' then positive is defined as the highest level. If outcome is a numerical
+#' variable, then positive is defined as the largest value.
 #' @param model model regression.
 #' @param args arguments passed to method from [lm()], [glm()] or [survival::coxph()].
 #' @param p.trend Tests for linear trend when exposure is numeric variable,
@@ -80,6 +84,7 @@ associate <- function(data,
                       time = NULL,
                       exposure = NULL,
                       covariates = NULL,
+                      positive = "auto",
                       model = c("auto", "linear", "logit", "cox", "poson", "logbinom", "multinom"),
                       args = list(),
                       p.trend = TRUE,
@@ -119,7 +124,11 @@ associate <- function(data,
   # a multiple linear regression model for continuous variables.
   model_coef <- function(data, x, covar){
     frm <- create_formula(dependent = c(time, outcome), independents = c(x, covar))
-    fit <- srmisc::do_call(model, data = data, formula = frm, args)
+    if(model == "linear"){
+      fit <- srmisc::do_call(model, data = data, formula = frm, args)
+    }else{
+      fit <- srmisc::do_call(model, data = data, formula = frm, positive = positive, args)
+    }
     srmisc::typeset(fit,
                     data = data,
                     outcome = outcome,
@@ -184,7 +193,7 @@ associate <- function(data,
     }
     names(output) <- c(names(output)[1:2], paste(MNAMES[1], names(output)[-c(1, 2)], sep = "__"))
 
-    # Merge model results bt variable
+    # Merge model results by variable
     for(i in 2:length(results)){
       output <- srmisc::merge_table(output, results[[i]][, -2, drop = FALSE], name.y = MNAMES[i])
     }

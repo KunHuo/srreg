@@ -4,7 +4,7 @@
 \alias{logit}
 \title{Fitting logistic models}
 \usage{
-logit(data, formula, ...)
+logit(data, formula, positive = "auto", ...)
 }
 \arguments{
 \item{data}{a data frame, list or environment (or object coercible by
@@ -12,6 +12,11 @@ as.data.frame to a data frame) containing the variables in the model.}
 
 \item{formula}{an object of class "formula" (or one that can be coerced to
 that class): a symbolic description of the model to be fitted.}
+
+\item{positive}{in which positive of outcome variable to make the comparison.
+By default, positive is automatically defined. If outcome is a factor variable,
+then positive is defined as the highest level. If outcome is a numerical
+variable, then positive is defined as the largest value.}
 
 \item{...}{additional arguments to be passed to \code{\link[=glm]{glm()}} function.}
 }

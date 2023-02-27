@@ -4,6 +4,10 @@
 #' @param outcome outcome variable name.
 #' @param time time variable name, for Cox regression.
 #' @param indepts independent variable names.
+#' @param positive in which positive of outcome variable to make the comparison.
+#' By default, positive is automatically defined. If outcome is a factor variable,
+#' then positive is defined as the highest level. If outcome is a numerical
+#' variable, then positive is defined as the largest value.
 #' @param model regression models.
 #' @param effect.values Effect value, 'ne' for No. of event, 'nt' for No. of
 #' total, 'net' for No. of event and total, 'nne' for No. of non-event, 'wald'
@@ -25,6 +29,7 @@ univariable <- function(data,
                         outcome = NULL,
                         time = NULL,
                         indepts = NULL,
+                        positive = "auto",
                         model = c("auto", "linear", "logit", "cox", "poson", "logbinom", "multinom"),
                         effect.values =  c("b", "se", "effect", "p"),
                         conf.level = 0.95,
@@ -48,6 +53,7 @@ univariable.data.frame <- function(data,
                                    outcome = NULL,
                                    time = NULL,
                                    indepts = NULL,
+                                   positive = "auto",
                                    model = c("auto", "linear", "logit", "cox", "poson", "logbinom", "multinom"),
                                    effect.values =  c("b", "se", "effect", "p"),
                                    conf.level = 0.95,
@@ -71,6 +77,10 @@ univariable.data.frame <- function(data,
 
   # model <- match.arg(model)
   model <- auto_model(data = data, outcome = outcome, time = time, model = model)
+
+  if(length(unique(data[[outcome]])) == 2L){
+    data <- positive_event(data, outcome, positive = positive)
+  }
 
   output <- lapply(indepts, \(x){
     frm <- create_formula(dependent = c(time, outcome), indepts)
@@ -124,6 +134,7 @@ univariable.lm <- function(data,
                                outcome = NULL,
                                time = NULL,
                                indepts = NULL,
+                               positive = NULL,
                                model = c("linear"),
                                effect.values =  c("b", "se", "effect", "p"),
                                conf.level = 0.95,
@@ -163,6 +174,7 @@ univariable.glm <- function(data,
                            outcome = NULL,
                            time = NULL,
                            indepts = NULL,
+                           positive = NULL,
                            model = c("linear", "logit", "poson", "logbinom"),
                            effect.values =  c("b", "se", "effect", "p"),
                            conf.level = 0.95,
@@ -215,6 +227,7 @@ univariable.coxph <- function(data,
                               outcome = NULL,
                               time = NULL,
                               indepts = NULL,
+                              positive = NULL,
                               model = c("cox"),
                               effect.values =  c("b", "se", "effect", "p"),
                               conf.level = 0.95,

@@ -10,6 +10,7 @@ associate(
   time = NULL,
   exposure = NULL,
   covariates = NULL,
+  positive = "auto",
   model = c("auto", "linear", "logit", "cox", "poson", "logbinom", "multinom"),
   args = list(),
   p.trend = TRUE,
@@ -35,6 +36,11 @@ associate(
 \item{exposure}{exposure variable name.}
 
 \item{covariates}{covariate names, a vector or a list.}
+
+\item{positive}{in which positive of outcome variable to make the comparison.
+By default, positive is automatically defined. If outcome is a factor variable,
+then positive is defined as the highest level. If outcome is a numerical
+variable, then positive is defined as the largest value.}
 
 \item{model}{model regression.}
 

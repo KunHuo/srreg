@@ -46,6 +46,6 @@ vif <-function(fit, ...) {
   }else{
     result[, 3] <- result[, 1]^(1/(2 * result[, 2]))
   }
-  result <- rownames_to_column(result)
+  result <- srmisc::rownames_to_column(result)
   result
 }
