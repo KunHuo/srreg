@@ -29,3 +29,21 @@ Fits a Cox proportional hazards regression model. Time dependent variables,
 time dependent strata, multiple events per subject, and other extensions are
 incorporated using the counting process formulation of Andersen and Gill.
 }
+\examples{
+library(srmisc)
+
+# set labels
+cancer <- codes2labels(cancer, cancer.codes)
+
+# Fit a Cox proportional hazards regression
+fit <- cox(cancer, Surv(time, status) ~ .)
+
+# Univariable Cox proportional hazards regression
+univariable(fit)
+
+# Multivariable Cox proportional hazards regression
+multivariable(fit)
+}
+\seealso{
+\code{\link[survival:coxph]{survival::coxph()}}
+}
