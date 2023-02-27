@@ -18,6 +18,23 @@
 #'
 #' @return an object of class coxph representing the fit.
 #' @export
+#'
+#' @seealso [survival::coxph()]
+#'
+#' @examples
+#' library(srmisc)
+#'
+#' # set labels
+#' cancer <- codes2labels(cancer, cancer.codes)
+#'
+#' # Fit a Cox proportional hazards regression
+#' fit <- cox(cancer, Surv(time, status) ~ .)
+#'
+#' # Univariable Cox proportional hazards regression
+#' univariable(fit)
+#'
+#' # Multivariable Cox proportional hazards regression
+#' multivariable(fit)
 cox <- function(data, formula, positive = "auto", ...){
   outcome <- all.vars(formula)[2]
   data <- positive_event(data, outcome, positive = positive)
