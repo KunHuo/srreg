@@ -31,3 +31,28 @@ linear <- function(data, formula, ...){
 
 }
 
+
+#' Fitting linear models
+#'
+#' @param data a data frame, list or environment (or object coercible by as.data.
+#' frame to a data frame) containing the variables in the model.
+#' @param outcome outcome variable name.
+#' @param exposure exposure variable name.
+#' @param covariates covariate names, a vector or a list.
+#' @param ... additional arguments to be passed to [lm()] function.
+#'
+#' @return an object of class "lm" or for multivariate ('multiple') responses
+#' of class c("mlm", "lm").
+#'
+#' @export
+linear2 <- function(data, outcome = NULL, exposure = NULL, covariates = NULL, ...){
+  outcome    <- srmisc::select_variable(data, outcome)
+  exposure   <- srmisc::select_variable(data, exposure)
+  covariates <- srmisc::select_variable(data, covariates)
+
+  frm <- create_formula(outcome, independents = c(exposure, covariates))
+
+  linear(data, formula = frm, ...)
+}
+
+
