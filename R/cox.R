@@ -43,3 +43,33 @@ cox <- function(data, formula, positive = "auto", ...){
   fit$data <- data
   fit
 }
+
+
+#' Fitting Cox models
+#'
+#' @param data a data frame, list or environment (or object coercible by as.data.
+#' frame to a data frame) containing the variables in the model.
+#' @param outcome outcome variable name.
+#' @param time time variable name.
+#' @param exposure exposure variable name.
+#' @param covariates covariate names, a vector or a list.
+#' @param positive in which positive of outcome variable to make the comparison.
+#' By default, positive is automatically defined. If outcome is a factor variable,
+#' then positive is defined as the highest level. If outcome is a numerical
+#' variable, then positive is defined as the largest value.
+#' @param ... Other arguments will be passed to [survival::coxph()].
+#'
+#' @return an object of class coxph representing the fit.
+#'
+#' @export
+cox2 <- function(data, outcome = NULL, time = NULL, exposure = NULL, covariates = NULL, positive = "auto", ...){
+
+  outcome    <- srmisc::select_variable(data, outcome)
+  time       <- srmisc::select_variable(data, time)
+  exposure   <- srmisc::select_variable(data, exposure)
+  covariates <- srmisc::select_variable(data, covariates)
+
+  frm <- create_formula(c(time, outcome), independents = c(exposure, covariates))
+
+  cox(data, formula = frm, positive = positive, ...)
+}
