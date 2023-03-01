@@ -44,3 +44,31 @@ logit <- function(data, formula, positive = "auto", ...){
   class(fit) <- c("logit", class(fit))
   fit
 }
+
+
+#' Fitting logistic models
+#'
+#' @param data a data frame, list or environment (or object coercible by as.data.
+#' frame to a data frame) containing the variables in the model.
+#' @param outcome outcome variable name.
+#' @param exposure exposure variable name.
+#' @param covariates covariate names, a vector or a list.
+#' @param positive in which positive of outcome variable to make the comparison.
+#' By default, positive is automatically defined. If outcome is a factor variable,
+#' then positive is defined as the highest level. If outcome is a numerical
+#' variable, then positive is defined as the largest value.
+#' @param ... additional arguments to be passed to [glm()] function.
+#'
+#' @return an object of class inheriting from "glm" which inherits from the
+#' class "lm".
+#'
+#' @export
+logit2 <- function(data, outcome = NULL, exposure = NULL, covariates = NULL, positive = "auto", ...){
+  outcome    <- srmisc::select_variable(data, outcome)
+  exposure   <- srmisc::select_variable(data, exposure)
+  covariates <- srmisc::select_variable(data, covariates)
+
+  frm <- create_formula(outcome, independents = c(exposure, covariates))
+
+  logit(data, formula = frm, positive = positive, ...)
+}
