@@ -283,7 +283,8 @@ subgroup <- function(data,
   if(srmisc::is_empty(covariates)){
     notes <- paste(abbr, "a Adjusted for nothing.", sep = "\n")
   }else{
-    notes <- paste(covariates, collapse = ", ")
+    notes <- sapply(covariates, function(x){ srmisc::get_var_label(data, x, default = ".name") })
+    notes <- paste(notes, collapse = ", ")
     notes <- paste("a Adjusted for ", notes, ", but exclude stratified variable.", sep = "")
     notes <- paste(abbr, notes, sep = "\n")
   }
