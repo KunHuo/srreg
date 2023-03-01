@@ -228,6 +228,7 @@ associate <- function(data,
     if(srmisc::is_empty(x)){
       "Adjusted for nonthing."
     }else{
+      x <- srmisc::get_var_label(data, x, default = ".name")
       sprintf("Adjusted for %s.", paste(x, collapse = ", "))
     }
   })
