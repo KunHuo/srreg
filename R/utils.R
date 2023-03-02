@@ -85,7 +85,7 @@ create_formula <- function(dependent, independents = NULL){
     dependent <- sprintf("survival::Surv (%s, %s)", dependent[1], dependent[2]) # time, status
   }
 
-  if(is.null(independents)){
+  if(srmisc::is_empty(independents)){
     frm <- paste(dependent, "1", sep = " ~ ")
     frm <- stats::as.formula(frm)
   }else{
