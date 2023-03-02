@@ -32,3 +32,24 @@ logbinom <- function(data, formula, positive = "auto", ...){
              family = stats::binomial(link = "log"), ...)
   fit
 }
+
+
+
+#' Fitting log-binomial models
+#'
+#' @inheritParams logit2
+#' @inherit logit2 return
+#'
+#' @export
+logbinom2 <- function(data, outcome = NULL, exposure = NULL, covariates = NULL, positive = "auto", ...){
+
+  outcome    <- srmisc::select_variable(data, outcome)
+  exposure   <- srmisc::select_variable(data, exposure)
+  covariates <- srmisc::select_variable(data, covariates)
+  covariates <- setdiff(covariates, outcome)
+  covariates <- setdiff(covariates, exposure)
+
+  frm <- create_formula(outcome, independents = c(exposure, covariates))
+
+  logbinom(data, formula = frm, positive = positive, ...)
+}
