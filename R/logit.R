@@ -67,6 +67,8 @@ logit2 <- function(data, outcome = NULL, exposure = NULL, covariates = NULL, pos
   outcome    <- srmisc::select_variable(data, outcome)
   exposure   <- srmisc::select_variable(data, exposure)
   covariates <- srmisc::select_variable(data, covariates)
+  covariates <- setdiff(covariates, outcome)
+  covariates <- setdiff(covariates, exposure)
 
   frm <- create_formula(outcome, independents = c(exposure, covariates))
 
