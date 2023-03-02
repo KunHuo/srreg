@@ -1,7 +1,7 @@
 Package: srreg
 Type: Package
 Title: Statistical Report for Regressions
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: person("Rongrui", "Huo", email = "huorongrui@sr.gxmu.edu.cn",
                   role = c("aut", "cre"))
 Maintainer: Rongrui Huo <huorongrui@sr.gxmu.edu.cn>
@@ -15,4 +15,7 @@ Imports:
     MatchIt,
     mediation,
     srmisc,
-    survival
+    srr2bline,
+    survey,
+    survival,
+    tableone

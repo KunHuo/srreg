@@ -19,5 +19,5 @@ print.srreg <- function(x, ...){
       ifelse(is.na(i), NA, format(i, justify = "right"))
     })
   }
-  srmisc::print_booktabs(x, ...)
+  srmisc::print_booktabs(x, adj = c("l", "c"), ...)
 }

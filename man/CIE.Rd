@@ -31,6 +31,8 @@ By default, positive is automatically defined. If outcome is a factor variable,
 then positive is defined as the highest level. If outcome is a numerical
 variable, then positive is defined as the largest value.}
 
+\item{model}{model regression.}
+
 \item{...}{further arguments.}
 }
 \value{

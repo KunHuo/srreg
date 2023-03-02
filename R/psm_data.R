@@ -1,6 +1,6 @@
-#' Construct a matched dataset from a matchps object
+#' Construct a matched dataset from a psmatch object
 #'
-#' @param object a matchps object; the output of a call to [matchps()].
+#' @param object a psmatch object; the output of a call to [matched()].
 #' @param type type matched dataset.
 #' @param drop.unmatched logical; whether the returned data frame should contain
 #' all units (FALSE) or only units that were matched (i.e., have a matching
@@ -9,7 +9,7 @@
 #'
 #' @return a data frame.
 #' @export
-match_data <- function(object, type = c("psm", "iptw", "unmatched"), drop.unmatched = TRUE, ...){
+psm_data <- function(object, type = c("psm", "iptw", "unmatched"), drop.unmatched = TRUE, ...){
   type <- match.arg(type)
   if(type == "psm"){
     MatchIt::match.data(object$fit, data = object$data, drop.unmatched = drop.unmatched)

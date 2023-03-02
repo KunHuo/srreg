@@ -21,7 +21,7 @@
 #' # Fit a linear model
 #' fit <- linear(iris, Sepal.Length ~ .)
 #'
-#' Coefficients of univariable linear regression
+#' # Coefficients of univariable linear regression
 #' univariable(fit)
 #'
 #' # Coefficients of multivariable linear regression
