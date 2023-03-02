@@ -33,3 +33,23 @@ poson <- function(data, formula, positive = "auto", ...){
              family = stats::poisson(link = "log"), ...)
   fit
 }
+
+
+#' Fitting poisson models
+#'
+#' @inheritParams logit2
+#' @inherit logit2 return
+#'
+#' @export
+poson2 <- function(data, outcome = NULL, exposure = NULL, covariates = NULL, positive = "auto", ...){
+
+  outcome    <- srmisc::select_variable(data, outcome)
+  exposure   <- srmisc::select_variable(data, exposure)
+  covariates <- srmisc::select_variable(data, covariates)
+  covariates <- setdiff(covariates, outcome)
+  covariates <- setdiff(covariates, exposure)
+
+  frm <- create_formula(outcome, independents = c(exposure, covariates))
+
+  poson(data, formula = frm, positive = positive, ...)
+}
