@@ -68,6 +68,9 @@ cox2 <- function(data, outcome = NULL, time = NULL, exposure = NULL, covariates 
   time       <- srmisc::select_variable(data, time)
   exposure   <- srmisc::select_variable(data, exposure)
   covariates <- srmisc::select_variable(data, covariates)
+  covariates <- setdiff(covariates, outcome)
+  covariates <- setdiff(covariates, exposure)
+  covariates <- setdiff(covariates, time)
 
   frm <- create_formula(c(time, outcome), independents = c(exposure, covariates))
 
