@@ -13,10 +13,6 @@ psm_baseline <- function(object, psm = TRUE, iptw = TRUE,
                              digits.numeric = digits.numeric,
                              digits.category = digits.category,
                              ...)
-
-
-  out <- res.unmatch
-
   if(psm){
     res.psm <-  srr2bline::baseline(data = psm_data(object, type = "psm"),
                                     group = object$exposure,
@@ -34,7 +30,6 @@ psm_baseline <- function(object, psm = TRUE, iptw = TRUE,
                                name.y = "After PS matching")
   }
 
-
   if(iptw){
     dat <- psm_data(object, type = "iptw")
     svydat <- survey::svydesign(ids = ~ 1, data = dat, weights = ~ iptw)
@@ -43,7 +38,6 @@ psm_baseline <- function(object, psm = TRUE, iptw = TRUE,
                                              strata = object$exposure,
                                              test = FALSE,
                                              smd = TRUE)
-
     res.iptw <- svyTable(res.iptw,
                          digits.pvalue = digits.smd,
                          digits.numeric = digits.numeric,
