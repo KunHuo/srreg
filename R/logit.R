@@ -41,7 +41,6 @@ logit <- function(data, formula, positive = "auto", ...){
   fit <- stats::glm(formula = formula,
              data = data,
              family = stats::binomial(link = "logit"), ...)
-  class(fit) <- c("logit", class(fit))
   fit
 }
 
