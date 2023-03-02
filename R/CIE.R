@@ -30,5 +30,5 @@ CIE <- function(data, outcome = NULL, time = NULL, exposure = NULL, covariates =
   }
 
   model <- auto_model(data, outcome = outcome, time = time, model = model)
-  model
+
 }
