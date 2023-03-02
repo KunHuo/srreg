@@ -12,6 +12,7 @@ LazyData: true
 RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
 Imports: 
+    MatchIt,
     mediation,
     srmisc,
     survival
