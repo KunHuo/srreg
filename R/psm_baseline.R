@@ -1,4 +1,6 @@
-psm_baseline <- function(object, psm = TRUE, iptw = TRUE,
+psm_baseline <- function(object,
+                         psm = TRUE,
+                         iptw = TRUE,
                          digits.smd = 3,
                          digits.numeric = 2,
                          digits.category = 1, ...){
