@@ -20,6 +20,7 @@ psm_estimate <- function(object, model = "auto", ...){
 
 
   data.psm <- psm_data(object)
+  class(data.psm) <- "data.frame"
   if(model == "linear"){
     fit.psm <- srmisc::do_call(model,
                            data = data.psm,
@@ -32,7 +33,7 @@ psm_estimate <- function(object, model = "auto", ...){
                            positive = positive,
                            weights = data.psm$weights)
   }
-  # res.psm <- lmtest::coeftest(fit.psm, vcov. = sandwich::vcovCL, cluster = data.psm$subclass)
+  res.psm <- lmtest::coeftest(fit.psm, vcov. = sandwich::vcovCL, cluster = data.psm$subclass)
 
   data.iptw <- psm_data(object, type = "iptw")
 
