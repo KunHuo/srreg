@@ -34,11 +34,39 @@ subgroup <- function(data,
                     ref.value = "Reference",
                     ...){
 
-  outcome    <- srmisc::select_variable(data, outcome)
-  time       <- srmisc::select_variable(data, time)
-  exposure   <- srmisc::select_variable(data, exposure)
-  covariates <- srmisc::select_variable(data, covariates)
-  strata     <- srmisc::select_variable(data, strata)
+
+  if("taskreg" %in% class(data)){
+    if(is.null(outcome)){
+      outcome <- data$outcome
+    }
+    if(is.null(time)){
+      time <- data$time
+    }
+    if(is.null(exposure)){
+      exposure <- data$exposure
+    }
+    if(is.null(covariates)){
+      covariates <- data$covariates
+    }
+    if(is.null(strata)){
+      strata <- data$strata
+    }
+    if(positive == "auto"){
+      positive <- data$positive
+    }
+
+    model <- match.arg(model)
+    if(model == "auto"){
+      model <- data$model
+    }
+    data <- data$data
+  }else{
+    outcome    <- srmisc::select_variable(data, outcome)
+    time       <- srmisc::select_variable(data, time)
+    exposure   <- srmisc::select_variable(data, exposure)
+    covariates <- srmisc::select_variable(data, covariates)
+    strata     <- srmisc::select_variable(data, strata)
+  }
 
   if(srmisc::is_empty(strata)){
     strata <- setdiff(names(data), outcome)
@@ -48,6 +76,8 @@ subgroup <- function(data,
   strata <- srmisc::select_factor(data, varnames = strata)
   strata <- setdiff(strata, outcome)
   strata <- setdiff(strata, exposure)
+
+  model <- auto_model(data, outcome, time, model)
 
   # Functions executed with a unique value of the exposure variable less than or equal to 2.
   exec2 <- function(svar){

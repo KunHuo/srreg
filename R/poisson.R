@@ -43,11 +43,29 @@ poson <- function(data, formula, positive = "auto", ...){
 #' @export
 poson2 <- function(data, outcome = NULL, exposure = NULL, covariates = NULL, positive = "auto", ...){
 
-  outcome    <- srmisc::select_variable(data, outcome)
-  exposure   <- srmisc::select_variable(data, exposure)
-  covariates <- srmisc::select_variable(data, covariates)
-  covariates <- setdiff(covariates, outcome)
-  covariates <- setdiff(covariates, exposure)
+  if("taskreg" %in% class(data)){
+    if(is.null(outcome)){
+      outcome <- data$outcome
+    }
+    if(is.null(exposure)){
+      exposure <- data$exposure
+    }
+    if(is.null(covariates)){
+      covariates <- data$covariates
+    }
+    if(positive == "auto"){
+      positive <- data$positive
+    }
+    covariates <- setdiff(covariates, outcome)
+    covariates <- setdiff(covariates, exposure)
+    data <- data$data
+  }else{
+    outcome    <- srmisc::select_variable(data, outcome)
+    exposure   <- srmisc::select_variable(data, exposure)
+    covariates <- srmisc::select_variable(data, covariates)
+    covariates <- setdiff(covariates, outcome)
+    covariates <- setdiff(covariates, exposure)
+  }
 
   frm <- create_formula(outcome, independents = c(exposure, covariates))
 
