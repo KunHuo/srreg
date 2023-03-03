@@ -99,9 +99,33 @@ associate <- function(data,
                       ref.value = "Reference",
                       ...){
 
-  outcome    <- srmisc::select_variable(data, outcome)
-  time       <- srmisc::select_variable(data, time)
-  exposure   <- srmisc::select_variable(data, exposure)
+  if("taskreg" %in% class(data)){
+    if(is.null(outcome)){
+      outcome <- data$outcome
+    }
+    if(is.null(time)){
+      time <- data$time
+    }
+    if(is.null(exposure)){
+      exposure <- data$exposure
+    }
+    if(is.null(covariates)){
+      covariates <- data$covariates
+    }
+    if(positive == "auto"){
+      positive <- data$positive
+    }
+
+    model <- match.arg(model)
+    if(model == "auto"){
+      model <- data$model
+    }
+    data <- data$data
+  }else{
+    outcome    <- srmisc::select_variable(data, outcome)
+    time       <- srmisc::select_variable(data, time)
+    exposure   <- srmisc::select_variable(data, exposure)
+  }
 
   if(srmisc::is_empty(covariates)){
     covariates <- list(NULL)

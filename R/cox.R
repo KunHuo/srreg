@@ -64,13 +64,35 @@ cox <- function(data, formula, positive = "auto", ...){
 #' @export
 cox2 <- function(data, outcome = NULL, time = NULL, exposure = NULL, covariates = NULL, positive = "auto", ...){
 
-  outcome    <- srmisc::select_variable(data, outcome)
-  time       <- srmisc::select_variable(data, time)
-  exposure   <- srmisc::select_variable(data, exposure)
-  covariates <- srmisc::select_variable(data, covariates)
-  covariates <- setdiff(covariates, outcome)
-  covariates <- setdiff(covariates, exposure)
-  covariates <- setdiff(covariates, time)
+  if("taskreg" %in% class(data)){
+    if(is.null(outcome)){
+      outcome <- data$outcome
+    }
+    if(is.null(time)){
+      time <- data$time
+    }
+    if(is.null(exposure)){
+      exposure <- data$exposure
+    }
+    if(is.null(covariates)){
+      covariates <- data$covariates
+    }
+    if(positive == "auto"){
+      positive <- data$positive
+    }
+    covariates <- setdiff(covariates, outcome)
+    covariates <- setdiff(covariates, exposure)
+    covariates <- setdiff(covariates, time)
+    data <- data$data
+  }else{
+    outcome    <- srmisc::select_variable(data, outcome)
+    time       <- srmisc::select_variable(data, time)
+    exposure   <- srmisc::select_variable(data, exposure)
+    covariates <- srmisc::select_variable(data, covariates)
+    covariates <- setdiff(covariates, outcome)
+    covariates <- setdiff(covariates, exposure)
+    covariates <- setdiff(covariates, time)
+  }
 
   frm <- create_formula(c(time, outcome), independents = c(exposure, covariates))
 
