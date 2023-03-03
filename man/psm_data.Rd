@@ -12,7 +12,7 @@ psm_data(
 )
 }
 \arguments{
-\item{object}{a psmatch object; the output of a call to \code{\link[=matched]{matched()}}.}
+\item{object}{a psmatch object; the output of a call to \code{\link[=psm]{psm()}}.}
 
 \item{type}{type matched dataset.}
 

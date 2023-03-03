@@ -1,3 +1,15 @@
+#' Baseline characteritics for matched data
+#'
+#' @param object a psmatch object; the output of a call to [psm()].
+#' @param psm logical, show baseline characteritics after PS.
+#' @param iptw logical, show baseline characteritics after IPTW.
+#' @param digits.smd digits for SMD, default 3.
+#' @param digits.numeric digits for numeric variable, default 2.
+#' @param digits.category  digits for category variable, default 1.
+#' @param ... arguments pass to [srr2bline::baseline()]
+#'
+#' @return a data frame.
+#' @export
 psm_baseline <- function(object,
                          psm = TRUE,
                          iptw = TRUE,
@@ -28,8 +40,8 @@ psm_baseline <- function(object,
                                     ...)
     out <- srmisc::merge_table(res.unmatch,
                                res.psm,
-                               name.x = "Before matching",
-                               name.y = "After PS matching")
+                               name.x = "Unmatched samples",
+                               name.y = "Propensity matching")
   }
 
   if(iptw){
@@ -52,17 +64,21 @@ psm_baseline <- function(object,
     names(res.iptw)[1] <- "Variable"
 
     if(psm){
-      out <- srmisc::merge_table(out, res.iptw, name.y = "After IPTW matching")
+      out <- srmisc::merge_table(out, res.iptw, name.y = "IPTW")
     }else{
       out <- srmisc::merge_table(res.unmatch,
                                  res.iptw,
-                                 name.x = "Before matching",
-                                 name.y = "After IPTW matching")
+                                 name.x = "Unmatched samples",
+                                 name.y = "IPTW")
     }
   }
 
   names(out)[1] <- "Characteritics"
+  title <- "Baseline characteritics before and after matching"
+  notes <- "Abbreviations: SMD, standardized mean difference; IPTW, inverse probability of treatment weighting."
 
+  attr(out, "title") <- title
+  attr(out, "note")  <- notes
   class(out) <- c("srreg", "data.frame")
   out
 }
@@ -116,6 +132,9 @@ svyContTable <- function(res,
     d <- as.data.frame(d)
     term <- row.names(d)
     desc.normal <- sprintf("%.2f\u00b1%.2f", d$mean, d$sd)
+    desc.normal <- sprintf("%s\u00b1%s",
+                           srmisc::fmt_digits(d$mean, digits.numeric),
+                           srmisc::fmt_digits(d$sd, digits.numeric))
     desc.nonnormal <- sprintf("%.2f (%.2f, %.2f)", d$median, d$p25, d$p75)
     desc <- ifelse(term %in% varnames.nonnormal, desc.nonnormal, desc.normal)
 

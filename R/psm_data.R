@@ -1,6 +1,6 @@
 #' Construct a matched dataset from a psmatch object
 #'
-#' @param object a psmatch object; the output of a call to [matched()].
+#' @param object a psmatch object; the output of a call to [psm()].
 #' @param type type matched dataset.
 #' @param drop.unmatched logical; whether the returned data frame should contain
 #' all units (FALSE) or only units that were matched (i.e., have a matching

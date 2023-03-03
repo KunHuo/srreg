@@ -31,19 +31,19 @@
 #' @return a list.
 #'
 #' @export
-psmatch <- function(data,
-                    outcome = NULL,
-                    time =NULL,
-                    exposure = NULL,
-                    covariates = NULL,
-                    positive = "auto",
-                    method = "nearest",
-                    distance = "glm",
-                    link = "logit",
-                    caliper = 0.2,
-                    std.caliper = TRUE,
-                    ratio = 1,
-                    ...){
+psm <- function(data,
+                outcome = NULL,
+                time =NULL,
+                exposure = NULL,
+                covariates = NULL,
+                positive = "auto",
+                method = "nearest",
+                distance = "glm",
+                link = "logit",
+                caliper = 0.2,
+                std.caliper = TRUE,
+                ratio = 1,
+                ...){
 
   outcome    <- srmisc::select_variable(data, outcome)
   time       <- srmisc::select_variable(data, time)
