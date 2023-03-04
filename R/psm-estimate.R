@@ -1,3 +1,11 @@
+#' Effects for matched data
+#'
+#' @param object a psmatch object; the output of a call to [psm()].
+#' @param model model regression.
+#' @param ... further armuments.
+#'
+#' @return a data frame.
+#' @export
 psm_estimate <- function(object, model = "auto", ...){
 
   outcome    <- object$outcome
@@ -34,10 +42,11 @@ psm_estimate <- function(object, model = "auto", ...){
                            weights = data.psm$weights)
   }
   res.psm <- lmtest::coeftest(fit.psm, vcov. = sandwich::vcovCL, cluster = data.psm$subclass)
+  res.psm
 
-  data.iptw <- psm_data(object, type = "iptw")
-
-  iptw_model(data = data.iptw, frm = frm, model = model)
+  # data.iptw <- psm_data(object, type = "iptw")
+  #
+  # iptw_model(data = data.iptw, frm = frm, model = model)
 
 }
 
