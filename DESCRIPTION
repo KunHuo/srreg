@@ -12,8 +12,10 @@ LazyData: true
 RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
 Imports: 
+    lmtest,
     MatchIt,
     mediation,
+    sandwich,
     srmisc,
     srr2bline,
     survey,
