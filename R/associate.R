@@ -230,8 +230,8 @@ associate <- function(data,
     }
   }
 
-  label.exposure <- srmisc::get_var_label(data, exposure, default = ".name")
-  label.outcome  <- srmisc::get_var_label(data, outcome,  default = ".name")
+  label.exposure <- srmisc::get_var_label(data, exposure, default = ".name", units = FALSE)
+  label.outcome  <- srmisc::get_var_label(data, outcome,  default = ".name", units = FALSE)
 
   # Output title
   title <- switch(model,
@@ -259,7 +259,7 @@ associate <- function(data,
     if(srmisc::is_empty(x)){
       "Adjusted for nonthing."
     }else{
-      x <- srmisc::get_var_label(data, x, default = ".name")
+      x <- srmisc::get_var_label(data, x, default = ".name", units = FALSE)
       sprintf("Adjusted for %s.", paste(x, collapse = ", "))
     }
   })
@@ -279,7 +279,7 @@ associate <- function(data,
     }else{
       note.trend <- "Tests for linear trend were done by modeling the median value of each group to test ordered relations across quantiles of %s."
     }
-    note.trend <- sprintf(note.trend, srmisc::get_var_label(data, exposure, default = ".name"))
+    note.trend <- sprintf(note.trend, srmisc::get_var_label(data, exposure, default = ".name", units = FALSE))
     if(length(results) == 1L){
       notes <- paste(notes, sprintf("%s %s.", "a", note.trend), sep = "\n")
     }else{
