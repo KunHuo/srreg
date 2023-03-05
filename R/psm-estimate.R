@@ -99,14 +99,14 @@ psm_estimate <- function(object, model = "auto", ...){
                  cox     = "Abbreviation: IPTW, inverse probability treatment weighting; HR, hazard ratio; CI, confidence interval.",
                  "Abbreviation: IPTW, inverse probability treatment weighting; CI, confidence interval.")
 
-  adjusted <- paste(sapply(covariates, function(x){ srmisc::get_var_label(object$data, x, default = ".name") }),  collapse = ", ")
+  adjusted <- paste(sapply(covariates, function(x){ srmisc::get_var_label(object$data, x, default = ".name", units = FALSE) }),  collapse = ", ")
   note1 <-sprintf("a Adjusted for %s before matching.", adjusted)
   note2 <- "b Propensity score matching with a cluster-robust standard error."
   note3 <- "c IPTW with a cluster-robust standard error."
   notes <- paste(abbr, note1, note2, note3, sep = "\n")
 
-  label.exposure <- srmisc::get_var_label(object$data, exposure, default = ".name")
-  label.outcome  <- srmisc::get_var_label(object$data, outcome,  default = ".name")
+  label.exposure <- srmisc::get_var_label(object$data, exposure, default = ".name", units = FALSE)
+  label.outcome  <- srmisc::get_var_label(object$data, outcome,  default = ".name", units = FALSE)
 
   title <- switch(model,
                   linear  = "multiple linear regression",
