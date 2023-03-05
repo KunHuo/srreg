@@ -294,26 +294,26 @@ subgroup <- function(data,
   if(is.null(time)){
     if(length(unique(data[[outcome]])) == 2L){
       title <- sprintf("Table: Association of %s with %s stratified by different factors using logistic regression model a",
-                       srmisc::get_var_label(data, exposure, default = ".name"),
-                       srmisc::get_var_label(data, outcome,  default = ".name"))
+                       srmisc::get_var_label(data, exposure, default = ".name", units = FALSE),
+                       srmisc::get_var_label(data, outcome,  default = ".name", units = FALSE))
       abbr <- "Abbreviation: OR, odds ratio; CI, confidence interval."
     }else{
       title <- sprintf("Table: Association of %s with %s stratified by different factors using linear regression model a",
-                       srmisc::get_var_label(data, exposure, default = ".name"),
-                       srmisc::get_var_label(data, outcome,  default = ".name"))
+                       srmisc::get_var_label(data, exposure, default = ".name", units = FALSE),
+                       srmisc::get_var_label(data, outcome,  default = ".name", units = FALSE))
       abbr <- "Abbreviation: CI, confidence interval."
     }
   }else{
     title <- sprintf("Table: Association of %s with %s stratified by different factors using Cox proportional hazards regression model a",
-                     srmisc::get_var_label(data, exposure, default = ".name"),
-                     srmisc::get_var_label(data, outcome,  default = ".name"))
+                     srmisc::get_var_label(data, exposure, default = ".name", units = FALSE),
+                     srmisc::get_var_label(data, outcome,  default = ".name", units = FALSE))
     abbr <- "Abbreviation: HR, hazard ratio; CI, confidence interval."
   }
 
   if(srmisc::is_empty(covariates)){
     notes <- paste(abbr, "a Adjusted for nothing.", sep = "\n")
   }else{
-    notes <- sapply(covariates, function(x){ srmisc::get_var_label(data, x, default = ".name") })
+    notes <- sapply(covariates, function(x){ srmisc::get_var_label(data, x, default = ".name", units = FALSE) })
     notes <- paste(notes, collapse = ", ")
     notes <- paste("a Adjusted for ", notes, ", but exclude stratified variable.", sep = "")
     notes <- paste(abbr, notes, sep = "\n")
@@ -327,7 +327,7 @@ subgroup <- function(data,
     }else{
       note.trend <- "b Tests for linear trend were done by modeling the median value of each group to test ordered relations across quantiles of %s"
     }
-    note.trend <- sprintf(note.trend, srmisc::get_var_label(data, exposure, default = ".name"))
+    note.trend <- sprintf(note.trend, srmisc::get_var_label(data, exposure, default = ".name", units = FALSE))
     notes <- paste(notes, note.trend, sep = "\n")
   }
 
