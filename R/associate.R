@@ -132,10 +132,17 @@ associate <- function(data,
   }else{
     if(is.list(covariates)){
       covariates <- lapply(covariates, \(covar){
-        srmisc::select_variable(data, covar)
+        covar <- srmisc::select_variable(data, covar)
+        covar <- setdiff(covar, outcome)
+        covar <- setdiff(covar, time)
+        covar <- setdiff(covar, exposure)
+        covar
       })
     }else{
       covariates <- srmisc::select_variable(data, covariates)
+      covariates <- setdiff(covariates, outcome)
+      covariates <- setdiff(covariates, time)
+      covariates <- setdiff(covariates, exposure)
       covariates <- list(covariates)
     }
   }
