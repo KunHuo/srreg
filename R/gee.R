@@ -49,8 +49,22 @@ gee_change <- function(data,
     stop("The 'id' can not be NULL. Which is a vector which identifies the clusters", call. = FALSE)
   }
 
-
   data[[exposure]] <- factor(data[[exposure]])
+
+  desc <- lapply(outcome[-1], \(x){
+    dat <- data.frame(diff = data[[x]] - data[[outcome[[1]]]], group = data[[exposure]])
+
+    res <- srmisc::group_exec(dat, group = "group", func = function(d){
+      data.frame(mean = sprintf("%s (%s)",
+                                srmisc::fmt_digits(mean(d[["diff"]]), 2),
+                                srmisc::fmt_digits(stats::sd(d[["diff"]]), 2) ))
+    })
+    res <- srmisc::transpose(res)
+    res[-1]
+  })
+
+  desc <- srmisc::list_rbind(desc)
+  names(desc)[1] <- "outcome"
 
   if(length(outcome) > 2L){
     data <- srmisc::reshape_long(data,
@@ -107,7 +121,9 @@ gee_change <- function(data,
 
   out <- lapply(covariates, exec)
 
-  do.call(rbind, out)
+  out <- do.call(rbind, out)
+
+  srmisc::merge_left(desc, out, by = "outcome")
 
 }
 
@@ -122,4 +138,6 @@ fmt_signif <- function(text, pvalues){
     pvalues <- ifelse(is.na(pvalues), "", format(pvalues, justify = "right"))
     paste(text, sign, sep = " ")
 }
+
+
 
