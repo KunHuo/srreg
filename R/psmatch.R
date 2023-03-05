@@ -85,3 +85,13 @@ psm <- function(data,
 }
 
 
+#' Print psmatch object
+#'
+#' @param x a psmatch object.
+#' @param ... further argumets pass to print function.
+#'
+#' @export
+print.psmatch <- function(x, ...){
+  print(x$fit)
+}
+
