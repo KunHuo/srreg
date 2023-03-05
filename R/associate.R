@@ -281,9 +281,9 @@ associate <- function(data,
     }
     note.trend <- sprintf(note.trend, srmisc::get_var_label(data, exposure, default = ".name", units = FALSE))
     if(length(results) == 1L){
-      notes <- paste(notes, sprintf("%s %s.", "a", note.trend), sep = "\n")
+      notes <- paste(notes, sprintf("%s %s", "a", note.trend), sep = "\n")
     }else{
-      notes <- paste(notes, sprintf("%s %s.", letters[length(results) + 1], note.trend), sep = "\n")
+      notes <- paste(notes, sprintf("%s %s", letters[length(results) + 1], note.trend), sep = "\n")
     }
   }
 
