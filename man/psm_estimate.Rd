@@ -11,7 +11,7 @@ psm_estimate(object, model = "auto", ...)
 
 \item{model}{model regression.}
 
-\item{...}{further armuments.}
+\item{...}{further armuments pass to \code{\link[=typeset]{typeset()}}.}
 }
 \value{
 a data frame.
