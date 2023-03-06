@@ -1,10 +1,27 @@
+#' Change from baseline by GEE
+#'
+#' @param data a data frame.
+#' @param outcome outcome variable name.
+#' @param exposure exposure variable name.
+#' @param covariates covariate names, a vector or a list.
+#' @param id which identifies the clusters.
+#' @param ci.change ci for change.
+#' @param family see corresponding documentation to [glm()]
+#' @param corstr a character string specifying the correlation structure.
+#' The following are permitted: independence, exchangeable, ar1, unstructured,
+#' and userdefined.
+#' @param ... further arguments passed to
+#'
+#' @return a data frame.
+#' @export
 gee_change <- function(data,
                 outcome = NULL,
                 exposure = NULL,
                 covariates = NULL,
                 id = NULL,
+                ci.change = TRUE,
                 family = gaussian(),
-                corstr = "independence",
+                corstr = "unstructured",
                 ...){
 
   if("taskreg" %in% class(data)){
@@ -55,9 +72,22 @@ gee_change <- function(data,
     dat <- data.frame(diff = data[[x]] - data[[outcome[[1]]]], group = data[[exposure]])
 
     res <- srmisc::group_exec(dat, group = "group", func = function(d){
-      data.frame(mean = sprintf("%s (%s)",
-                                srmisc::fmt_digits(mean(d[["diff"]]), 2),
-                                srmisc::fmt_digits(stats::sd(d[["diff"]]), 2) ))
+
+      m <- mean(d[["diff"]], na.rm = TRUE)
+      s <- stats::sd(d[["diff"]], na.rm = TRUE) / length(na.omit(d[["diff"]])) ^ 0.5
+
+      if(!ci.change){
+        data.frame(mean = sprintf("%s (%s)",
+                                  srmisc::fmt_digits(m, 2),
+                                  srmisc::fmt_digits(s, 2) ))
+      }else{
+        data.frame(mean = sprintf("%s (%s to %s)",
+                                  srmisc::fmt_digits(m, 2),
+                                  srmisc::fmt_digits(m - 1.96 * s, 2),
+                                  srmisc::fmt_digits(m + 1.96 * s, 2)))
+      }
+
+
     })
     res <- srmisc::transpose(res)
     res[-1]
