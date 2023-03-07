@@ -11,7 +11,7 @@ gee_change(
   covariates = NULL,
   id = NULL,
   ci.change = TRUE,
-  family = gaussian(),
+  family = stats::gaussian(),
   corstr = "unstructured",
   ...
 )
