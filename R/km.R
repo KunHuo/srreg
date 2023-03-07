@@ -1,186 +1,18 @@
-#
-# surv_median <- function(data, event = NULL, time = NULL, independents = NULL,
-#                         exclude = NULL,
-#                         positive = NULL,
-#                         digits.median = 1,
-#                         digits.pvalue = 3,
-#                         fmt = NULL,
-#                         test = TRUE,
-#                         rho = 0,
-#                         show.stat = FALSE,
-#                         show.event.number = TRUE,
-#                         show.total.number = TRUE){
-#
-#   data <- positive_event(data = data, varname = event, positive = positive)
-#
-#
-#   if(!is.null(independents)){
-#     if(independents[1] == "ALL"){
-#       independents <- names(data)[sapply(data, function(x){ is.factor(x) | is.character(x)})]
-#     }
-#   }
-#   independents <- setdiff(independents, event)
-#   independents <- setdiff(independents, time)
-#   independents <- setdiff(independents, exclude)
-#
-#   execute <- function(x){
-#     frm <- sprintf("survival::Surv(%s, %s) ~ %s", time, event, x)
-#     frm <- stats::as.formula(frm)
-#     fit <- survival::survfit(formula = frm, data = data)
-#     fit
-#   }
-#
-#   format_median <- function(res){
-#     res[[3]] <- sprintf(fmt,
-#                         format_digits(res[[3]], digits = digits.median),
-#                         format_digits(res[[4]], digits = digits.median),
-#                         format_digits(res[[5]], digits = digits.median))
-#     res <- res[, -c(4, 5), drop = FALSE]
-#     res
-#   }
-#
-#   if(is.null(fmt)){
-#     fmt <- "%s (%s\u2013%s)"
-#   }
-#
-#   if(is.null(independents)){
-#     out <- execute("1")
-#     out <- print_survfit(out)
-#     out <- as.list(out)
-#     out <- as.data.frame(out)
-#     out <- format_median(out)
-#     names(out) <- c("n", "No. of event", "Median time (95% CI)")
-#     if(!show.event.number){
-#       out <- out[, -2, drop = FALSE]
-#     }
-#     if(!show.total.number){
-#       out <- out[, -1, drop = FALSE]
-#     }
-#     out
-#   }else{
-#     out <- lapply(independents, function(x){
-#       res <- execute(x)
-#       res <- print_survfit(res)
-#       res <- as.data.frame(res)
-#       res <- format_median(res)
-#       term <- regex_replace(row.names(res), "=", "", fixed = TRUE)
-#       variable <- regex_replace(row.names(res), paste0(x, "="), "", fixed = TRUE)
-#       variable <- paste0("    ", variable)
-#       res <- cbind(data.frame(term, variable), res)
-#       res <- rbind(NA, res)
-#       res[1, 1] <- x
-#       res[1, 2] <- get_label(data, x)
-#       row.names(res) <- NULL
-#       res
-#     })
-#     out <- do.call(rbind, out)
-#
-#     if(test){
-#       lk <- log_rank(data = data, event = event, time = time, independents = independents, exclude, digits.pvalue = digits.pvalue, rho = rho)
-#       lk <- cbind(attr(lk, "term"), lk)
-#       lk <- lk[, -2]
-#       out <- merge_left(out, lk, by = "term")
-#       term <- out[1]
-#       out <- out[-1]
-#       names(out) <- c("Variable", "n", "No. of event", "Median time (95% CI)", "Chisq", "P value")
-#       if(!show.stat){
-#         out <- out[, -which(names(out) == "Chisq")]
-#       }
-#       if(!show.event.number){
-#         out <- out[, -3, drop = FALSE]
-#       }
-#       if(!show.total.number){
-#         out <- out[, -2, drop = FALSE]
-#       }
-#       attr(out, "term") <- term
-#       attr(out, "title") <- "Median survival time"
-#       class(out) <- c("mst", class(out))
-#       out
-#     }
-#   }
-# }
-#
-#
-# surv_rate <- function(data, event = NULL, time = NULL, independents = NULL, point = NULL,
-#                       exclude = NULL,
-#                       positive = NULL){
-#
-#   data <- positive_event(data = data, varname = event, positive = positive)
-#
-#   if(!is.null(independents)){
-#     if(independents[1] == "ALL"){
-#       independents <- names(data)[sapply(data, function(x){ is.factor(x) | is.character(x)})]
-#     }
-#   }
-#   independents <- setdiff(independents, event)
-#   independents <- setdiff(independents, time)
-#   independents <- setdiff(independents, exclude)
-#
-#
-#   execute <- function(x){
-#     frm <- sprintf("survival::Surv(%s, %s) ~ %s", time, event, x)
-#     frm <- stats::as.formula(frm)
-#     fit <- survival::survfit(formula = frm, data = data)
-#     fit
-#   }
-#
-#
-#   if(is.null(independents)){
-#     out <- execute("1")
-#     out <- summary(out, point)
-#     out
-#   }else{
-#     out <- lapply(independents, function(x){
-#       res <- execute(x)
-#       res <- summary(res, point)
-#       res
-#     })
-#     out
-#   }
-#
-#
-# }
-#
-#
-#
-#
-#
-#
-# log_rank <- function(data, event = NULL, time = NULL, independents = NULL, exclude = NULL, positive = NULL, rho = 0, digits.pvalue = 3){
-#   data <- positive_event(data = data, varname = event, positive = positive)
-#
-#   if(is.null(independents)){
-#     independents <- names(data)[sapply(data, function(x){ is.factor(x) | is.character(x)})]
-#   }
-#   independents <- setdiff(independents, event)
-#   independents <- setdiff(independents, time)
-#   independents <- setdiff(independents, exclude)
-#
-#   execute <- function(x){
-#     frm <- sprintf("survival::Surv(%s, %s) ~ %s", time, event, x)
-#     frm <- stats::as.formula(frm)
-#     fit <- survival::survdiff(formula = frm, data = data, rho = rho)
-#     chisq <- format_pvalue(fit$chisq, digits.pvalue)
-#     pvalue <- format_pvalue(stats::pchisq(fit$chisq, length(fit$n) - 1, lower.tail = FALSE), digits = digits.pvalue)
-#     data.frame(term = x, Variable = get_label(data, x), chisq = chisq, P = pvalue, stringsAsFactors = FALSE)
-#   }
-#   out <- lapply(independents, execute)
-#   out <- do.call(rbind, out)
-#
-#   if(rho == 0){
-#     title <- "Log-rank test"
-#   }else{
-#     title <- "Gehan-Wilcoxon test"
-#   }
-#
-#   term <- out[, 1, drop = FALSE]
-#   out <- out[, -1, drop = FALSE]
-#   names(out) <- c("Variable", "Chisq", "P value")
-#   attr(out, "term") <- term
-#   attr(out, "title") <- title
-#   class(out) <- c("logrank", class(out))
-#   out
-# }
+log_rank <- function(data, outcome = NULL, time = NULL, varnames = NULL, rho = 0, digits.pvalue = 3){
+
+  execute <- function(x){
+    frm <- sprintf("survival::Surv(%s, %s) ~ %s", time, outcome, x)
+    frm <- stats::as.formula(frm)
+    fit <- survival::survdiff(formula = frm, data = data, rho = rho)
+    chisq <- srmisc::fmt_pvalue(fit$chisq, digits.pvalue)
+    pvalue <- srmisc::fmt_pvalue(stats::pchisq(fit$chisq, length(fit$n) - 1, lower.tail = FALSE), digits = digits.pvalue)
+    data.frame(term = x,  chisq = chisq, P = pvalue, stringsAsFactors = FALSE)
+  }
+  out <- lapply(varnames, execute)
+  out <- do.call(rbind, out)
+  out
+}
+
 
 km <- function(data,
                outcome = NULL,
@@ -188,7 +20,11 @@ km <- function(data,
                exposure = NULL,
                covariates = NULL,
                positive = "auto",
+               test = TRUE,
+               median = TRUE,
+               at = NULL,
                digits.median = 1,
+               digits.pvalue = 3,
                overall = FALSE,
                ci = TRUE,
                ...){
@@ -225,6 +61,109 @@ km <- function(data,
   data <- positive_event(data, outcome, positive)
   varnames <- unique(c(exposure, covariates))
 
+
+  if(srmisc::is_empty(varnames)){
+    out <- data.frame(term = "Overall")
+    if(median){
+      surv.median <- surv_median(data, outcome, time, varnames, overall, ci, digits.median)
+      out <- srmisc::merge_left(out, surv.median, by = "term")
+    }
+
+    if(!is.null(at)){
+      surv.rate <- surv_rate(data, outcome, time, varnames, at, overall, ci, digits.median)
+      out <- srmisc::merge_left(out, surv.rate, by = "term")
+    }
+
+  }else{
+    if(overall){
+      out <- srmisc::fmt_reg(data, varnames = varnames, add.first = "Overall")
+    }else{
+      out <- srmisc::fmt_reg(data, varnames = varnames)
+    }
+
+    if(median){
+      surv.median <- surv_median(data, outcome, time, varnames, overall, ci, digits.median)
+      out <- srmisc::merge_left(out, surv.median, by = "term")
+    }
+
+    if(!is.null(at)){
+      surv.rate <- surv_rate(data, outcome, time, varnames, at, overall, ci, digits.median)
+      out <- srmisc::merge_left(out, surv.rate, by = "term")
+    }
+
+    if(test){
+      surv.test <- log_rank(data,
+               outcome = outcome,
+               time = time,
+               varnames = varnames,
+               digits.pvalue = digits.pvalue)
+      out <- srmisc::merge_left(out, surv.test, by = "term")
+    }
+
+    out <- out[-c(1:3)]
+  }
+
+  class(out) <- c("srreg", "data.frame")
+
+  out
+}
+
+
+
+surv_rate <- function(data, outcome, time, varnames, at = NULL, overall = FALSE, ci = TRUE, digits = 1){
+  extract_rate <- function(fit){
+    sfit <- summary(fit, at)
+    if(is.null(sfit$strata)){
+      strata <- "Overall"
+      term <- data.frame(term = paste0("Overall", at), at = at, id = "Overall")
+
+    }else{
+      strata <- sfit$strata
+      term <- rep(levels(sfit$strata), each = length(at))
+      term <- paste0(term, rep(at, time = length(levels(sfit$strata))))
+      term <- data.frame(term = term, at = rep(at, length(levels(sfit$strata))))
+      term <- term[order(term$at), ]
+      term$id <- rep(srmisc::regex_replace(levels(sfit$strata), "=", "", fixed = TRUE), time = length(at))
+    }
+    if(ci){
+      fmt  <- srmisc::fmt_ci(sep = ", ", digits = digits)
+      rate <- sprintf(fmt, sfit$surv * 100, sfit$lower * 100,  sfit$upper * 100)
+    }else{
+      rate <- srmisc::fmt_digits(sfit$surv * 100, digits)
+    }
+    res <- data.frame(strata = strata, time = sfit$time, rate = rate)
+    res$term <- paste0(res$strata, res$time)
+    res <- srmisc::merge_left(term, res, by = "term")
+    res <- res[c("id", "at", "rate")]
+    res <- srmisc::reshape_wide(res, id = "id", names.from = "at", values.from = "rate")
+    names(res)[1] <- "term"
+    res
+  }
+
+  if(srmisc::is_empty(varnames)){
+    frm <- create_formula(c(time, outcome))
+    fit <- survival::survfit(frm, data = data)
+    out <- extract_rate(fit)
+  }else{
+    exec <- function(x){
+      frm <- create_formula(c(time, outcome), x)
+      fit <- survival::survfit(frm, data = data)
+      out <- extract_rate(fit)
+    }
+    out <- lapply(varnames, exec)
+    out <- do.call(rbind, out)
+    if(overall){
+      res.all <- extract_rate(survival::survfit(create_formula(c(time, outcome)), data = data))
+      out <- rbind(res.all, out)
+    }
+    out
+  }
+  out
+}
+
+
+
+surv_median <- function(data, outcome, time, varnames, overall = FALSE, ci = TRUE, digits.median = 1){
   extract_median <- function(fit){
     res.median <- print_survfit(fit)
     if(is.vector(res.median)){
@@ -234,10 +173,10 @@ km <- function(data,
     }else{
       res.median <- as.data.frame(res.median)
       res.median <- srmisc::rownames_to_column(res.median)
-      res.median$term <- regex_replace(res.median$term, pattern = "=", "", fixed = TRUE)
+      res.median$term <- srmisc::regex_replace(res.median$term, pattern = "=", "", fixed = TRUE)
     }
     if(ci){
-      fmt <- fmt_ci(sep = ", ", digits = digits.median)
+      fmt <- srmisc::fmt_ci(sep = ", ", digits = digits.median)
       res.median$median <- sprintf(fmt, res.median$median, res.median[[5]],  res.median[[6]])
     }else{
       res.median$median <- srmisc::fmt_digits(res.median$median, digits.median)
@@ -272,21 +211,11 @@ km <- function(data,
     }
     out
   }
-
-  if(!srmisc::is_empty(varnames)){
-    if(overall){
-      terms <- srmisc::fmt_reg(data = data, varnames = varnames, add.first = "Overall")
-    }else{
-      terms <- srmisc::fmt_reg(data = data, varnames = varnames)
-    }
-    out <- srmisc::merge_left(terms, out, by = "term")
-    out <- out[, -c(1:3)]
-  }
-
-
-  class(out) <- c("srreg", "data.frame")
   out
 }
+
+
+
 
 print_survfit <- function(x, scale=1,
                           digits = max(options()$digits - 4, 3),
