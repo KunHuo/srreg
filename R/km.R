@@ -1,19 +1,3 @@
-log_rank <- function(data, outcome = NULL, time = NULL, varnames = NULL, rho = 0, digits.pvalue = 3){
-
-  execute <- function(x){
-    frm <- sprintf("survival::Surv(%s, %s) ~ %s", time, outcome, x)
-    frm <- stats::as.formula(frm)
-    fit <- survival::survdiff(formula = frm, data = data, rho = rho)
-    chisq <- srmisc::fmt_pvalue(fit$chisq, digits.pvalue)
-    pvalue <- srmisc::fmt_pvalue(stats::pchisq(fit$chisq, length(fit$n) - 1, lower.tail = FALSE), digits = digits.pvalue)
-    data.frame(term = x,  chisq = chisq, P = pvalue, stringsAsFactors = FALSE)
-  }
-  out <- lapply(varnames, execute)
-  out <- do.call(rbind, out)
-  out
-}
-
-
 km <- function(data,
                outcome = NULL,
                time = NULL,
@@ -102,12 +86,24 @@ km <- function(data,
 
     out <- out[-c(1:3)]
   }
-
   class(out) <- c("srreg", "data.frame")
-
   out
 }
 
+
+log_rank <- function(data, outcome = NULL, time = NULL, varnames = NULL, rho = 0, digits.pvalue = 3){
+  execute <- function(x){
+    frm <- sprintf("survival::Surv(%s, %s) ~ %s", time, outcome, x)
+    frm <- stats::as.formula(frm)
+    fit <- survival::survdiff(formula = frm, data = data, rho = rho)
+    chisq <- srmisc::fmt_pvalue(fit$chisq, digits.pvalue)
+    pvalue <- srmisc::fmt_pvalue(stats::pchisq(fit$chisq, length(fit$n) - 1, lower.tail = FALSE), digits = digits.pvalue)
+    data.frame(term = x,  chisq = chisq, P = pvalue, stringsAsFactors = FALSE)
+  }
+  out <- lapply(varnames, execute)
+  out <- do.call(rbind, out)
+  out
+}
 
 
 surv_rate <- function(data, outcome, time, varnames, at = NULL, overall = FALSE, ci = TRUE, digits = 1){
