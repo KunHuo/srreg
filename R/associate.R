@@ -35,50 +35,6 @@
 #'
 #' @return a data.frame.
 #' @export
-#'
-#' @examples
-#' library(srmisc)
-#'
-#' cancer$sex  <- factor(cancer$sex)
-#' cancer$race <- factor(cancer$race)
-#' cancer$meta <- factor(cancer$meta)
-#'
-#' # Association Between Metastasis and Tumor size by Linear Regression Model
-#' # Model 1 adjusted for age, sex.
-#' # Model 2 adjusted for age, sex, and race.
-#' associate(data = cancer,
-#'           outcome = "size",
-#'           exposure = "meta",
-#'           covariates = list(c("sex", "age"), c("sex", "age", "race")))
-#'
-#' # Association Between Race and Metastasis by Logistic Regression Model
-#' # Model 1 adjusted for nothing.
-#' # Model 2 adjusted for age, sex, and size.
-#' associate(data = cancer,
-#'           outcome = "meta",
-#'           exposure = "race",
-#'           covariates = list("Adjusted 1" = NULL,
-#'                             "Adjusted 2" = c("sex", "age", "size")))
-#'
-#' # Association Between Race and Survival status by Cox Proportional Hazards Regression Model
-#' # Model 1 adjusted for nothing.
-#' # Model 2 adjusted for age, sex, and size.
-#' associate(data = cancer,
-#'           outcome = "status",
-#'           time = "time",
-#'           exposure = "race",
-#'           covariates = list("Adjusted 1" = NULL,
-#'                             "Adjusted 2" = c("sex", "age", "size")))
-#'
-#' # Tests for linear trend were done by modeling the median value of each quantile
-#' # to test ordered relations across quantiles of size.
-#' associate(data = cancer,
-#'           outcome = "status",
-#'           time = "time",
-#'           exposure = "size",
-#'           covariates = list("Adjusted 1" = NULL,
-#'                             "Adjusted 2" = c("sex", "age", "race")),
-#'           n.quantile = 4)
 associate <- function(data,
                       outcome = NULL,
                       time = NULL,
