@@ -20,7 +20,7 @@ gee_change <- function(data,
                 covariates = NULL,
                 id = NULL,
                 ci.change = TRUE,
-                family = gaussian(),
+                family = stats::gaussian(),
                 corstr = "unstructured",
                 ...){
 
@@ -74,7 +74,7 @@ gee_change <- function(data,
     res <- srmisc::group_exec(dat, group = "group", func = function(d){
 
       m <- mean(d[["diff"]], na.rm = TRUE)
-      s <- stats::sd(d[["diff"]], na.rm = TRUE) / length(na.omit(d[["diff"]])) ^ 0.5
+      s <- stats::sd(d[["diff"]], na.rm = TRUE) / length(stats::na.omit(d[["diff"]])) ^ 0.5
 
       if(!ci.change){
         data.frame(mean = sprintf("%s (%s)",
