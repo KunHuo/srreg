@@ -1,3 +1,25 @@
+#' Kaplan-Meier method
+#'
+#' @param data a data frame.
+#' @param outcome outcome variable name.
+#' @param time time variable name, for Cox regression.
+#' @param exposure exposure variable name.
+#' @param covariates covariate names, a vector or a list.
+#' @param positive in which positive of outcome variable to make the comparison.
+#' By default, positive is automatically defined. If outcome is a factor variable,
+#' then positive is defined as the highest level. If outcome is a numerical
+#' variable, then positive is defined as the largest value.
+#' @param test show log-rank test?
+#' @param median show median survival?
+#' @param at survival rate at points of time.
+#' @param digits.median digits for median survival.
+#' @param digits.pvalue digits for P value.
+#' @param overall show the result of all patients?
+#' @param ci show CI?
+#' @param ... unused.
+#'
+#' @return a data frame.
+#' @export
 km <- function(data,
                outcome = NULL,
                time = NULL,
@@ -209,7 +231,6 @@ surv_median <- function(data, outcome, time, varnames, overall = FALSE, ci = TRU
   }
   out
 }
-
 
 
 
