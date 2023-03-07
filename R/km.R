@@ -188,6 +188,9 @@ km <- function(data,
                exposure = NULL,
                covariates = NULL,
                positive = "auto",
+               digits.median = 1,
+               overall = FALSE,
+               ci = TRUE,
                ...){
 
   if("taskreg" %in% class(data)){
@@ -224,30 +227,65 @@ km <- function(data,
 
   extract_median <- function(fit){
     res.median <- print_survfit(fit)
-    if(srmisc::is_empty(varnames)){
+    if(is.vector(res.median)){
       res.median <- as.data.frame(as.list(res.median))
+      res.median <- srmisc::rownames_to_column(res.median)
+      res.median[1, 1] <- "Overall"
     }else{
       res.median <- as.data.frame(res.median)
-
+      res.median <- srmisc::rownames_to_column(res.median)
+      res.median$term <- regex_replace(res.median$term, pattern = "=", "", fixed = TRUE)
     }
-    res.median <- srmisc::rownames_to_column(res.median)
+    if(ci){
+      fmt <- fmt_ci(sep = ", ", digits = digits.median)
+      res.median$median <- sprintf(fmt, res.median$median, res.median[[5]],  res.median[[6]])
+    }else{
+      res.median$median <- srmisc::fmt_digits(res.median$median, digits.median)
+    }
+    res.median$desc <- sprintf("%d/%d", res.median$event, res.median$n)
+    res.median <- res.median[c("term", "desc", "median")]
+
+    if(ci){
+      names(res.median) <- c("term", "No. of event/total", "Median survival (95% CI)")
+    }else{
+      names(res.median) <- c("term", "No. of event/total", "Median survival")
+    }
     res.median
   }
 
   if(srmisc::is_empty(varnames)){
-    frms <- list(create_formula(c(time, outcome)))
-  }else{
-    frms <- lapply(varnames, \(x) create_formula(c(time, outcome), x))
-  }
-
-  exec <- function(frm){
+    frm <- create_formula(c(time, outcome))
     fit <- survival::survfit(frm, data = data)
-    surv.median <- extract_median(fit)
+    out <- extract_median(fit)
+  }else{
+    exec <- function(x){
+      frm <- create_formula(c(time, outcome), x)
+      fit <- survival::survfit(frm, data = data)
+      extract_median(fit)
+    }
+    out <- lapply(varnames, exec)
+    out <- do.call(rbind, out)
+
+    if(overall){
+      res.all <- extract_median(survival::survfit(create_formula(c(time, outcome)), data = data))
+      out <- rbind(res.all, out)
+    }
+    out
   }
 
-  lapply(frms, exec)
+  if(!srmisc::is_empty(varnames)){
+    if(overall){
+      terms <- srmisc::fmt_reg(data = data, varnames = varnames, add.first = "Overall")
+    }else{
+      terms <- srmisc::fmt_reg(data = data, varnames = varnames)
+    }
+    out <- srmisc::merge_left(terms, out, by = "term")
+    out <- out[, -c(1:3)]
+  }
 
 
+  class(out) <- c("srreg", "data.frame")
+  out
 }
 
 print_survfit <- function(x, scale=1,
